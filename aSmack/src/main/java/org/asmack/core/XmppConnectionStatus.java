@@ -19,9 +19,19 @@
 
 package org.asmack.core;
 
-public class AndroidSmack {
+public class XmppConnectionStatus {
 
-    public static void test() {
-        System.out.println("hello");
-    }
+	public enum State {
+		Connected,
+		Connecting,
+		Disconnecting,
+		Disconnected,
+		InstantDisconnected,
+		WaitingForNetwork,
+		WaitingForRetry,
+		;
+	}
+
+	private State state;
+	private String optionalInfo;
 }
