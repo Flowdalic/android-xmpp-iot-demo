@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file:///data/flo/code/android-xmpp-iot-demo/aSmack/aSmack.iml" filepath="/data/flo/code/android-xmpp-iot-demo/aSmack/aSmack.iml" />
+      <module fileurl="file:///data/flo/code/android-xmpp-iot-demo/android-xmpp-iot-demo.iml" filepath="/data/flo/code/android-xmpp-iot-demo/android-xmpp-iot-demo.iml" />
+      <module fileurl="file:///data/flo/code/android-xmpp-iot-demo/app/app.iml" filepath="/data/flo/code/android-xmpp-iot-demo/app/app.iml" />
+    </modules>
+  </component>
+</project>
