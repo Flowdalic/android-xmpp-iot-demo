@@ -26,6 +26,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
 
 	ImageView myJidPresenceImageView;
 	ImageView otherJidPresenceImageView;
+	Button mReadOutButton;
+	Switch mContinousReadOutSwitch;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
 
 		myJidPresenceImageView = (ImageView) findViewById(R.id.my_jid_presence_image_view);
 		otherJidPresenceImageView = (ImageView) findViewById(R.id.other_jid_presence_image_view);
+		mReadOutButton = (Button) findViewById(R.id.read_out_button);
+		mContinousReadOutSwitch = (Switch) findViewById(R.id.continues_read_out_switch);
 
 		Toolbar mainToolbar = (Toolbar) findViewById(R.id.mainToolbar);
 		setSupportActionBar(mainToolbar);

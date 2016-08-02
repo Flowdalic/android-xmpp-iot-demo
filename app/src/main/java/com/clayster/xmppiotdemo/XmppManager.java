@@ -118,6 +118,11 @@ public class XmppManager implements RosterListener, ConnectionListener {
 		if (settings.isBasicConfigurationDone() && xmppConnection == null) {
 			adoptXmppConfiguration();
 		}
+		if (xmppConnection == null) return;
+
+		boolean connectionUsable = xmppConnection.isAuthenticated();
+		mainActivity.mReadOutButton.setEnabled(connectionUsable);
+		mainActivity.mContinousReadOutSwitch.setEnabled(connectionUsable);
 	}
 
 	void mainActivityOnDestroy(MainActivity mainActivity) {
@@ -172,7 +177,11 @@ public class XmppManager implements RosterListener, ConnectionListener {
 			}
 		}
 		connection.addAsyncStanzaListener(mMessageListener, MessageWithBodiesFilter.INSTANCE);
-		withMainActivity((ma) -> ma.myJidPresenceImageView.setImageDrawable(mOnlineDrawable));
+		withMainActivity((ma) -> {
+					ma.myJidPresenceImageView.setImageDrawable(mOnlineDrawable);
+					ma.mReadOutButton.setEnabled(true);
+					ma.mContinousReadOutSwitch.setEnabled(true);
+				});
 	}
 
 	@Override
@@ -187,7 +196,11 @@ public class XmppManager implements RosterListener, ConnectionListener {
 
 	private void connectionTerminated() {
 		xmppConnection.removeAsyncStanzaListener(mMessageListener);
-		withMainActivity((ma) -> ma.myJidPresenceImageView.setImageDrawable(mOfflineDrawable));
+		withMainActivity((ma) -> {
+			ma.myJidPresenceImageView.setImageDrawable(mOfflineDrawable);
+			ma.mReadOutButton.setEnabled(false);
+			ma.mContinousReadOutSwitch.setEnabled(false);
+		});
 	}
 
 	@Override
