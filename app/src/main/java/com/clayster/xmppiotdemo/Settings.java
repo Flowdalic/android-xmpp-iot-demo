@@ -24,10 +24,19 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.widget.EditText;
 
+import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smack.util.StringUtils;
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
+
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.net.ssl.SSLContext;
+
+import eu.geekplace.javapinning.JavaPinning;
 
 public class Settings {
 
@@ -48,6 +57,7 @@ public class Settings {
 
 	private EntityBareJid myJidCache;
 	private EntityBareJid otherJidCache;
+	private XMPPTCPConnectionConfiguration.Builder confBuilderCache;
 
 	private Settings(Context context) {
 		this.preferences = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
@@ -60,10 +70,38 @@ public class Settings {
 				.putString(OTHER_JID_KEY, otherJid.toString()).apply();
 		myJidCache = myJid;
 		otherJidCache = otherJid;
+		confBuilderCache = null;
+	}
+
+	public boolean isBasicConfigurationDone() {
+		return getMyJid() != null && StringUtils.isNotEmpty(getPassword()) && getOtherJid() != null;
 	}
 
 	public XMPPTCPConnectionConfiguration.Builder getConnectionConfigBuilder() {
-		XMPPTCPConnectionConfiguration.Builder builder = XMPPTCPConnectionConfiguration.builder();
+		if (!isBasicConfigurationDone()) return null;
+
+		if (confBuilderCache == null) {
+			XMPPTCPConnectionConfiguration.Builder builder = XMPPTCPConnectionConfiguration.builder();
+
+			String password = getPassword();
+			builder.setUsernameAndPassword(getMyJid().getLocalpart(), password);
+			builder.setXmppDomain(getMyJid().asDomainBareJid());
+
+			builder.setSecurityMode(ConnectionConfiguration.SecurityMode.required);
+			SSLContext sc = null;
+			try {
+				sc = JavaPinning.forPin("SHA256:e3b1812d945da1a2a2c5fa28029d2fe34c7c4142fb098f5cfedff1ff20e98781");
+			} catch (KeyManagementException | NoSuchAlgorithmException e) {
+				throw new IllegalStateException(e);
+			}
+			builder.setCustomSSLContext(sc);
+
+			confBuilderCache = builder;
+		}
+		return confBuilderCache;
+	}
+
+	public EntityBareJid getMyJid() {
 		if (myJidCache == null) {
 			String myJidString = preferences.getString(MY_JID_KEY, null);
 			if (myJidString == null) return null;
@@ -73,10 +111,11 @@ public class Settings {
 				throw new IllegalStateException(e);
 			}
 		}
-		String password = preferences.getString(PASSWORD_KEY, null);
-		builder.setUsernameAndPassword(myJidCache.getLocalpart(), password);
-		builder.setXmppDomain(myJidCache.asDomainBareJid());
-		return builder;
+		return myJidCache;
+	}
+
+	public String getPassword() {
+		return preferences.getString(PASSWORD_KEY, null);
 	}
 
 	public EntityBareJid getOtherJid() {

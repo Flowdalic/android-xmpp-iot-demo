@@ -20,8 +20,11 @@
 package org.asmack.core;
 
 import android.content.Context;
+import android.content.Intent;
 
 import org.jivesoftware.smack.SmackConfiguration;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.sasl.SASLMechanism;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
@@ -29,11 +32,16 @@ import org.jivesoftware.smack.util.DNSUtil;
 import org.jivesoftware.smack.util.Objects;
 import org.jivesoftware.smack.util.StringTransformer;
 
+import java.io.IOException;
 import java.text.Normalizer;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AndroidSmackManager {
+
+	private static final Logger LOGGER = Logger.getLogger(AndroidSmackManager.class.getName());
 
 	static {
 		// Some network types, especially GPRS or EDGE is rural areas have a very slow response
@@ -44,6 +52,7 @@ public class AndroidSmackManager {
 
 		SmackConfiguration.addDisabledSmackClass("org.jivesoftares.smack.legacy");
 		SmackConfiguration.addDisabledSmackClass("org.jivesoftware.smack.java7");
+		SmackConfiguration.addDisabledSmackClass("org.jivesoftware.smackx.iot");
 
 		DNSUtil.setIdnaTransformer(new StringTransformer() {
 			@Override
@@ -57,12 +66,6 @@ public class AndroidSmackManager {
 				return Normalizer.normalize(string, Normalizer.Form.NFKC);
 			}
 		});
-	}
-
-	private enum State {
-		enabled,
-		disabled,
-		;
 	}
 
 	private static AndroidSmackManager INSTANCE;
@@ -79,8 +82,6 @@ public class AndroidSmackManager {
 
 	private final Map<XMPPTCPConnection, XmppConnectionStatus> xmppTcpConnections = new WeakHashMap<>();
 
-	private State state;
-
 	private AndroidSmackManager(Context context) {
 		this.context = context;
 	}
@@ -91,15 +92,41 @@ public class AndroidSmackManager {
 		return connection;
 	}
 
-	public synchronized void enable() {
-		if (state == State.enabled) return;
-
-		state = State.enabled;
+	public void enable() {
+		sendIntentToService(AndroidSmackService.ACTION_START_SERVICE);
 	}
 
-	public synchronized void disable() {
-		if (state == State.disabled) return;
+	public void disable() {
+		sendIntentToService(AndroidSmackService.ACTION_STOP_SERVICE);
+	}
 
-		state = State.disabled;
+	private void sendIntentToService(String action) {
+		Intent intent = new Intent(context, AndroidSmackService.class);
+		intent.setAction(action);
+		context.startService(intent);
+	}
+
+	void connectConnections() {
+		for (XMPPTCPConnection connection : xmppTcpConnections.keySet()) {
+			try {
+				connection.connect();
+			} catch (SmackException | XMPPException | InterruptedException | IOException e) {
+				LOGGER.log(Level.WARNING, "connect() throw", e);
+				continue;
+			}
+
+			try {
+				connection.login();
+			} catch (SmackException | XMPPException | InterruptedException | IOException e) {
+				LOGGER.log(Level.WARNING, "login() throw", e);
+				continue;
+			}
+		}
+	}
+
+	void disconnectConnections() {
+		for (XMPPTCPConnection connection : xmppTcpConnections.keySet()) {
+			connection.disconnect();
+		}
 	}
 }

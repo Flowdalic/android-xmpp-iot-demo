@@ -75,6 +75,7 @@ public class Setup extends AppCompatActivity {
 
 		Toast.makeText(this, "My JID: " + myJid + " Password: " + password + " Other Jid: " + otherJid, Toast.LENGTH_LONG).show();
 		Settings.getInstance(this).saveBasics(myJid, password, otherJid);
+		XmppManager.getInstance(this).adoptXmppConfiguration();
 		finish();
 	}
 }

@@ -22,18 +22,99 @@ package com.clayster.xmppiotdemo;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Switch;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
+
+	private Settings settings;
+
+	private LinearLayout setupLinearLayout;
+	private LinearLayout controlLinearLayout;
+
+	private TextView mOtherJidTextView;
+
+	private XmppManager xmppManager;
+
+	ImageView otherJidPresenceImageView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		setupLinearLayout = (LinearLayout) findViewById(R.id.setup_linear_layout);
+		controlLinearLayout = (LinearLayout) findViewById(R.id.controlLayout);
+
+		mOtherJidTextView = (TextView) findViewById(R.id.otherJidTextView);
+
+		otherJidPresenceImageView = (ImageView) findViewById(R.id.other_jid_presence_image_view);
+
+		Toolbar mainToolbar = (Toolbar) findViewById(R.id.mainToolbar);
+		setSupportActionBar(mainToolbar);
+
+		settings = Settings.getInstance(this);
+
+		if (settings.getOtherJid() != null) {
+			mOtherJidTextView.setText(settings.getOtherJid());
+		}
+
+		xmppManager = XmppManager.getInstance(this);
+		xmppManager.mainActivityOnCreate(this);
 	}
 
 	public void configureButtonClicked(View view) {
 		startActivity(new Intent(this, Setup.class));
+	}
+
+	public void enableSwitchToggled(View view) {
+		Switch enableSwitch = (Switch) view;
+		if (enableSwitch.isChecked()) {
+			xmppManager.enable();
+		} else {
+			xmppManager.disable();
+		}
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.menu_main, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		boolean res = false;
+		switch (item.getItemId()) {
+			case R.id.action_settings:
+				startActivity(new Intent(this, Setup.class));
+				res = true;
+				break;
+		}
+		return res;
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		if (settings.isBasicConfigurationDone()) {
+			setupLinearLayout.setVisibility(View.GONE);
+			controlLinearLayout.setVisibility(View.VISIBLE);
+		} else {
+			setupLinearLayout.setBackgroundColor(View.VISIBLE);
+			controlLinearLayout.setVisibility(View.GONE);
+		}
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		xmppManager.mainActivityOnDestroy(this);
 	}
 }

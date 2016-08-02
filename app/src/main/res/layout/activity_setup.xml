@@ -36,7 +36,8 @@
         android:ems="10"
         android:id="@+id/myJidText"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:hint="myJid@example.org"/>
 
     <EditText
         android:layout_width="wrap_content"
@@ -46,7 +47,8 @@
         android:id="@+id/passwordText"
         android:layout_below="@+id/myJidText"
         android:layout_alignLeft="@+id/myJidText"
-        android:layout_alignStart="@+id/myJidText"/>
+        android:layout_alignStart="@+id/myJidText"
+        android:hint="password"/>
 
     <EditText
         android:layout_width="wrap_content"
@@ -56,12 +58,13 @@
         android:id="@+id/otherJidText"
         android:layout_below="@+id/passwordText"
         android:layout_alignLeft="@+id/passwordText"
-        android:layout_alignStart="@+id/passwordText"/>
+        android:layout_alignStart="@+id/passwordText"
+        android:hint="otherJid@example.org"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Button"
+        android:text="Save"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:onClick="saveButtonClicked"/>
