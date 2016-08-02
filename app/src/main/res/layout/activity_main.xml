@@ -54,12 +54,58 @@
             android:layout_height="wrap_content"
             android:gravity="end"
             android:text="Enable"
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:id="@+id/enableSwitch"
             android:onClick="enableSwitchToggled"/>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="?android:attr/dividerHorizontal"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="My JID"
+            android:id="@+id/my_jid_headline_text_view"/>
+
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:hint="My JID not set"
+                android:id="@+id/my_jid_text_view"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/my_jid_presence_image_view"
+                android:layout_toRightOf="@+id/my_jid_text_view"
+                android:layout_toEndOf="@+id/my_jid_text_view"
+                android:layout_centerVertical="true"
+                android:src="@android:drawable/presence_offline"/>
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Thing JID"
+            android:id="@+id/thing_jid_headline_text_view"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -68,7 +114,6 @@
                 android:hint="Other JID not set"
                 android:id="@+id/otherJidTextView"
                 android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"/>
 
             <ImageView
@@ -83,14 +128,14 @@
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="20px"
+            android:layout_height="5dp"
             android:background="?android:attr/dividerHorizontal"
             />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="XEP-0323: Data"
             android:id="@+id/data_section_headline_text_view"/>
 
@@ -103,7 +148,20 @@
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="20px"
+            android:layout_height="5dp"
+            android:background="?android:attr/dividerHorizontal"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="XEP-0325: Control"
+            android:id="@+id/control_section_headline_text_view"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
             android:background="?android:attr/dividerHorizontal"
             />
 

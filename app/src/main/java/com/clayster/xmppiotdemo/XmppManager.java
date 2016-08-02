@@ -64,10 +64,18 @@ public class XmppManager implements RosterListener, ConnectionListener {
 	private final Object mainActivityLock = new Object();
 	private MainActivity mainActivity;
 
+	private final Drawable mOnlineDrawable;
+	private final Drawable mOfflineDrawable;
+	private final Drawable mConnectingDrawlable;
+
 	private XmppManager(Context context) {
 		this.context = context;
 		this.settings = Settings.getInstance(context);
 		this.asmackManager = AndroidSmackManager.getInstance(context);
+
+		mOnlineDrawable = ContextCompat.getDrawable(context, android.R.drawable.presence_online);
+		mOfflineDrawable = ContextCompat.getDrawable(context, android.R.drawable.presence_offline);
+		mConnectingDrawlable = ContextCompat.getDrawable(context, android.R.drawable.presence_away);
 	}
 
 	public void adoptXmppConfiguration() {
@@ -143,7 +151,7 @@ public class XmppManager implements RosterListener, ConnectionListener {
 
 	@Override
 	public void connected(XMPPConnection connection) {
-
+		withMainActivity((ma) -> ma.myJidPresenceImageView.setImageDrawable(mConnectingDrawlable));
 	}
 
 	private final StanzaListener mMessageListener = (stanza) -> {
@@ -164,6 +172,7 @@ public class XmppManager implements RosterListener, ConnectionListener {
 			}
 		}
 		connection.addAsyncStanzaListener(mMessageListener, MessageWithBodiesFilter.INSTANCE);
+		withMainActivity((ma) -> ma.myJidPresenceImageView.setImageDrawable(mOnlineDrawable));
 	}
 
 	@Override
@@ -178,6 +187,7 @@ public class XmppManager implements RosterListener, ConnectionListener {
 
 	private void connectionTerminated() {
 		xmppConnection.removeAsyncStanzaListener(mMessageListener);
+		withMainActivity((ma) -> ma.myJidPresenceImageView.setImageDrawable(mOfflineDrawable));
 	}
 
 	@Override
@@ -199,9 +209,9 @@ public class XmppManager implements RosterListener, ConnectionListener {
 		Presence presence = roster.getPresence(settings.getOtherJid());
 		final Drawable drawable;
 		if (presence != null && presence.isAvailable()) {
-			drawable = ContextCompat.getDrawable(context, android.R.drawable.presence_online);
+			drawable = mOnlineDrawable;
 		} else {
-			drawable = ContextCompat.getDrawable(context, android.R.drawable.presence_offline);
+			drawable = mOfflineDrawable;
 		}
 		withMainActivity((ma) ->
 					ma.otherJidPresenceImageView.setImageDrawable(drawable)

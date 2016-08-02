@@ -38,10 +38,12 @@ public class MainActivity extends AppCompatActivity {
 	private LinearLayout setupLinearLayout;
 	private LinearLayout controlLinearLayout;
 
+	private TextView mMyJidTextView;
 	private TextView mOtherJidTextView;
 
 	private XmppManager xmppManager;
 
+	ImageView myJidPresenceImageView;
 	ImageView otherJidPresenceImageView;
 
 	@Override
@@ -52,8 +54,10 @@ public class MainActivity extends AppCompatActivity {
 		setupLinearLayout = (LinearLayout) findViewById(R.id.setup_linear_layout);
 		controlLinearLayout = (LinearLayout) findViewById(R.id.controlLayout);
 
+		mMyJidTextView = (TextView) findViewById(R.id.my_jid_text_view);
 		mOtherJidTextView = (TextView) findViewById(R.id.otherJidTextView);
 
+		myJidPresenceImageView = (ImageView) findViewById(R.id.my_jid_presence_image_view);
 		otherJidPresenceImageView = (ImageView) findViewById(R.id.other_jid_presence_image_view);
 
 		Toolbar mainToolbar = (Toolbar) findViewById(R.id.mainToolbar);
@@ -63,6 +67,10 @@ public class MainActivity extends AppCompatActivity {
 
 		if (settings.getOtherJid() != null) {
 			mOtherJidTextView.setText(settings.getOtherJid());
+		}
+
+		if (settings.getMyJid() != null) {
+			mMyJidTextView.setText(settings.getMyJid());
 		}
 
 		xmppManager = XmppManager.getInstance(this);
