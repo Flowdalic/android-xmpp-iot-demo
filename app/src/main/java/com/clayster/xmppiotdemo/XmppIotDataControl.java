@@ -25,7 +25,6 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smackx.iot.data.IoTDataManager;
-import org.jivesoftware.smackx.iot.data.element.IoTDataField;
 import org.jivesoftware.smackx.iot.data.element.IoTFieldsExtension;
 import org.jxmpp.jid.EntityFullJid;
 
@@ -43,7 +42,7 @@ public class XmppIotDataControl {
 		if (INSTANCE == null) {
 			INSTANCE = new XmppIotDataControl(context);
 		}
-		return instance;
+		return INSTANCE;
 	}
 
 	private final Context mContext;
@@ -51,7 +50,7 @@ public class XmppIotDataControl {
 	private final Settings mSettings;
 
 
-	private XmppIotDatacontrol(Context context) {
+	private XmppIotDataControl(Context context) {
 		mContext = context.getApplicationContext();
 		mXmppManager = XmppManager.getInstance(mContext);
 		mSettings = Settings.getInstance(mContext);
@@ -70,6 +69,5 @@ public class XmppIotDataControl {
 			return;
 		}
 
-		for ()
 	}
 }
