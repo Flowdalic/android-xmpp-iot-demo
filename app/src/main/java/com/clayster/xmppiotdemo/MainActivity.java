@@ -70,16 +70,10 @@ public class MainActivity extends AppCompatActivity {
 
 		settings = Settings.getInstance(this);
 
-		if (settings.getOtherJid() != null) {
-			mOtherJidTextView.setText(settings.getOtherJid());
-		}
-
-		if (settings.getMyJid() != null) {
-			mMyJidTextView.setText(settings.getMyJid());
-		}
-
 		xmppManager = XmppManager.getInstance(this);
 		xmppManager.mainActivityOnCreate(this);
+
+		XmppIotThing.getInstance(this);
 	}
 
 	public void configureButtonClicked(View view) {
@@ -122,6 +116,14 @@ public class MainActivity extends AppCompatActivity {
 		} else {
 			setupLinearLayout.setBackgroundColor(View.VISIBLE);
 			controlLinearLayout.setVisibility(View.GONE);
+		}
+
+		if (settings.getOtherJid() != null) {
+			mOtherJidTextView.setText(settings.getOtherJid());
+		}
+
+		if (settings.getMyJid() != null) {
+			mMyJidTextView.setText(settings.getMyJid());
 		}
 	}
 

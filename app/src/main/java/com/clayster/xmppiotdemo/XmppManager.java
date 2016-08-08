@@ -36,13 +36,19 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smack.roster.RosterListener;
+import org.jivesoftware.smack.roster.SubscribeListener;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jxmpp.jid.EntityFullJid;
 import org.jxmpp.jid.Jid;
 
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class XmppManager implements RosterListener, ConnectionListener {
+
+	private static final Logger LOGGER = Logger.getLogger(XmppManager.class.getName());
 
 	private static XmppManager INSTANCE;
 
@@ -53,7 +59,7 @@ public class XmppManager implements RosterListener, ConnectionListener {
 		return INSTANCE;
 	}
 
-	private final Context context;
+	private final Context mContext;
 	private final Settings settings;
 	private final AndroidSmackManager asmackManager;
 
@@ -69,13 +75,13 @@ public class XmppManager implements RosterListener, ConnectionListener {
 	private final Drawable mConnectingDrawlable;
 
 	private XmppManager(Context context) {
-		this.context = context;
-		this.settings = Settings.getInstance(context);
-		this.asmackManager = AndroidSmackManager.getInstance(context);
+		this.mContext = context.getApplicationContext();
+		this.settings = Settings.getInstance(mContext);
+		this.asmackManager = AndroidSmackManager.getInstance(mContext);
 
-		mOnlineDrawable = ContextCompat.getDrawable(context, android.R.drawable.presence_online);
-		mOfflineDrawable = ContextCompat.getDrawable(context, android.R.drawable.presence_offline);
-		mConnectingDrawlable = ContextCompat.getDrawable(context, android.R.drawable.presence_away);
+		mOnlineDrawable = ContextCompat.getDrawable(mContext, android.R.drawable.presence_online);
+		mOfflineDrawable = ContextCompat.getDrawable(mContext, android.R.drawable.presence_offline);
+		mConnectingDrawlable = ContextCompat.getDrawable(mContext, android.R.drawable.presence_away);
 	}
 
 	public void adoptXmppConfiguration() {
@@ -98,7 +104,13 @@ public class XmppManager implements RosterListener, ConnectionListener {
 		xmppConnection = asmackManager.createManagedConnection(conf);
 
 		roster = Roster.getInstanceFor(xmppConnection);
-		roster.setSubscriptionMode(Roster.SubscriptionMode.reject_all);
+		roster.setSubscribeListener((from, presence) -> {
+			if (from.equals(settings.getOtherJid())) {
+				return SubscribeListener.SubscribeAnswer.Approve;
+			} else {
+				return SubscribeListener.SubscribeAnswer.Deny;
+			}
+		});
 		roster.addRosterListener(this);
 
 		xmppConnection.addConnectionListener(this);
@@ -173,9 +185,10 @@ public class XmppManager implements RosterListener, ConnectionListener {
 			try {
 				roster.sendSubscriptionRequest(settings.getOtherJid());
 			} catch (SmackException.NotLoggedInException | SmackException.NotConnectedException | InterruptedException e) {
-				e.printStackTrace();
+				LOGGER.log(Level.SEVERE, "Could not send subscription request to other JID", e);
 			}
 		}
+
 		connection.addAsyncStanzaListener(mMessageListener, MessageWithBodiesFilter.INSTANCE);
 		withMainActivity((ma) -> {
 					ma.myJidPresenceImageView.setImageDrawable(mOnlineDrawable);
@@ -231,15 +244,26 @@ public class XmppManager implements RosterListener, ConnectionListener {
 		);
 	}
 
-	private interface WithMainActivity {
+	interface WithMainActivity {
 		void withMainActivity(MainActivity mainActivity);
 	}
 
-	private void withMainActivity(final WithMainActivity withMainActivity) {
+	void withMainActivity(final WithMainActivity withMainActivity) {
 		synchronized (mainActivityLock) {
 			if (mainActivity == null) return;
 			mainActivity.runOnUiThread(() -> withMainActivity.withMainActivity(mainActivity));
 		}
 	}
 
+	EntityFullJid getFullOtherJid() {
+		Presence presence = roster.getPresence(settings.getOtherJid());
+		if (presence == null) return null;
+		EntityFullJid fullOtherJid = presence.getFrom().asEntityFullJidIfPossible();
+		if (fullOtherJid == null) throw new IllegalStateException();
+		return fullOtherJid;
+	}
+
+	XMPPTCPConnection getXmppConnection() {
+		return xmppConnection;
+	}
 }

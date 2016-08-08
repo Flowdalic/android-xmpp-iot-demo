@@ -35,7 +35,9 @@ import org.jivesoftware.smack.util.StringTransformer;
 import java.io.IOException;
 import java.text.Normalizer;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -82,14 +84,31 @@ public class AndroidSmackManager {
 
 	private final Map<XMPPTCPConnection, XmppConnectionStatus> xmppTcpConnections = new WeakHashMap<>();
 
+	private final Set<NewManagedConnectionListener> mNewConnectionListeners = new CopyOnWriteArraySet<>();
+
 	private AndroidSmackManager(Context context) {
 		this.context = context;
 	}
 
 	public XMPPTCPConnection createManagedConnection(XMPPTCPConnectionConfiguration configuration) {
 		XMPPTCPConnection connection = new XMPPTCPConnection(configuration);
-		xmppTcpConnections.put(connection, new XmppConnectionStatus());
+
+		for (NewManagedConnectionListener newManagedConnectionListener : mNewConnectionListeners) {
+			newManagedConnectionListener.newConnection(connection);
+		}
+
+		synchronized (xmppTcpConnections) {
+			xmppTcpConnections.put(connection, new XmppConnectionStatus());
+		}
 		return connection;
+	}
+
+	public void addNewManagedConnectionListener(NewManagedConnectionListener newManagedConnectionListener) {
+		mNewConnectionListeners.add(newManagedConnectionListener);
+	}
+
+	public void removeNewManagedConnectionListener(NewManagedConnectionListener newManagedConnectionListener) {
+		mNewConnectionListeners.remove(newManagedConnectionListener);
 	}
 
 	public void enable() {
@@ -107,26 +126,30 @@ public class AndroidSmackManager {
 	}
 
 	void connectConnections() {
-		for (XMPPTCPConnection connection : xmppTcpConnections.keySet()) {
-			try {
-				connection.connect();
-			} catch (SmackException | XMPPException | InterruptedException | IOException e) {
-				LOGGER.log(Level.WARNING, "connect() throw", e);
-				continue;
-			}
+		synchronized (xmppTcpConnections) {
+			for (XMPPTCPConnection connection : xmppTcpConnections.keySet()) {
+				try {
+					connection.connect();
+				} catch (SmackException | XMPPException | InterruptedException | IOException e) {
+					LOGGER.log(Level.WARNING, "connect() throw", e);
+					continue;
+				}
 
-			try {
-				connection.login();
-			} catch (SmackException | XMPPException | InterruptedException | IOException e) {
-				LOGGER.log(Level.WARNING, "login() throw", e);
-				continue;
+				try {
+					connection.login();
+				} catch (SmackException | XMPPException | InterruptedException | IOException e) {
+					LOGGER.log(Level.WARNING, "login() throw", e);
+					continue;
+				}
 			}
 		}
 	}
 
 	void disconnectConnections() {
-		for (XMPPTCPConnection connection : xmppTcpConnections.keySet()) {
-			connection.disconnect();
+		synchronized (xmppTcpConnections) {
+			for (XMPPTCPConnection connection : xmppTcpConnections.keySet()) {
+				connection.disconnect();
+			}
 		}
 	}
 }
