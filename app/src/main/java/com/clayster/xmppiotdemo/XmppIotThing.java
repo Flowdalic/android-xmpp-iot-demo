@@ -199,13 +199,20 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 		Intent intent = mContext.registerReceiver(null, intentFilter);
 
 		int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-		boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL;
+		boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING;
 		IoTDataField.BooleanField chargingField = new IoTDataField.BooleanField("charging", isCharging);
 		dataFields.add(chargingField);
+
+		int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+		boolean isPlugged = plugged == BatteryManager.BATTERY_PLUGGED_AC || plugged == BatteryManager.BATTERY_PLUGGED_USB || plugged == BatteryManager.BATTERY_PLUGGED_WIRELESS;
+		IoTDataField.BooleanField pluggedField = new IoTDataField.BooleanField("plugged", isPlugged);
+		dataFields.add(pluggedField);
 
 		int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
 		int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 		float batteryPercent = level / (float) scale;
+		// Scale to percents.
+		batteryPercent *= 100;
 		IoTDataField.IntField batteryPercentField = new IoTDataField.IntField("batteryPrecent", (int) batteryPercent);
 		dataFields.add(batteryPercentField);
 	}
