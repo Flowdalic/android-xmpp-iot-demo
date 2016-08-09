@@ -183,91 +183,12 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/data_values_linear_layout">
+            android:id="@+id/iot_sensors_linear_layout">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:layout_toStartOf="@+id/data_point1_space"
-                    android:text="Sensor F"
-                    android:id="@+id/data_point1_name_text_view"/>
-
-                <Space
-                    android:layout_width="20dp"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:id="@+id/data_point1_space"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toEndOf="@id/data_point1_space"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="On"
-                    android:id="@+id/data_point1_value_text_view"/>
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:layout_toStartOf="@+id/data_point2_space"
-                    android:text="Sensor Barz"
-                    android:id="@+id/data_point2_name_text_view"/>
-
-                <Space
-                    android:layout_width="20dp"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:id="@+id/data_point2_space"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toEndOf="@id/data_point2_space"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="Barz has a long value"
-                    android:id="@+id/data_point2_value_text_view"/>
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:layout_toStartOf="@+id/data_point3_space"
-                    android:text="Sensor Long Name"
-                    android:id="@+id/data_point3_name_text_view"/>
-
-                <Space
-                    android:layout_width="20dp"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:id="@+id/data_point3_space"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toEndOf="@id/data_point3_space"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="42"
-                    android:id="@+id/data_point3_value_text_view"/>
-            </RelativeLayout>
+                android:text="No data read-out so far."/>
 
         </LinearLayout>
 

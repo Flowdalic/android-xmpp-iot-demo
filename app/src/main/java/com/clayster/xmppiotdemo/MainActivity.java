@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
 	private LinearLayout setupLinearLayout;
 	private LinearLayout controlLinearLayout;
+	LinearLayout mIotSensorsLinearLayout;
 
 	private TextView mMyJidTextView;
 	private TextView mOtherJidTextView;
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
 		setupLinearLayout = (LinearLayout) findViewById(R.id.setup_linear_layout);
 		controlLinearLayout = (LinearLayout) findViewById(R.id.controlLayout);
+		mIotSensorsLinearLayout = (LinearLayout) findViewById(R.id.iot_sensors_linear_layout);
 
 		mMyJidTextView = (TextView) findViewById(R.id.my_jid_text_view);
 		mOtherJidTextView = (TextView) findViewById(R.id.otherJidTextView);
@@ -70,10 +72,13 @@ public class MainActivity extends AppCompatActivity {
 
 		settings = Settings.getInstance(this);
 
+		XmppIotThing.getInstance(this);
+
 		xmppManager = XmppManager.getInstance(this);
 		xmppManager.mainActivityOnCreate(this);
 
-		XmppIotThing.getInstance(this);
+		XmppIotDataControl xmppIotDataControl = XmppIotDataControl.getInstance(this);
+		mReadOutButton.setOnClickListener((button) -> xmppIotDataControl.performReadOutAsync());
 	}
 
 	public void configureButtonClicked(View view) {

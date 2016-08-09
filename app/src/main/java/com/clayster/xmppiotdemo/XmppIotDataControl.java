@@ -24,7 +24,9 @@ import android.content.Context;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jivesoftware.smack.util.Async;
 import org.jivesoftware.smackx.iot.data.IoTDataManager;
+import org.jivesoftware.smackx.iot.data.element.IoTDataField;
 import org.jivesoftware.smackx.iot.data.element.IoTFieldsExtension;
 import org.jxmpp.jid.EntityFullJid;
 
@@ -56,12 +58,18 @@ public class XmppIotDataControl {
 		mSettings = Settings.getInstance(mContext);
 	}
 
+	void performReadOutAsync() {
+		Async.go(() -> performReadOut());
+	}
+
 	void performReadOut() {
 		XMPPTCPConnection connection = mXmppManager.getXmppConnection();
 		EntityFullJid fullOtherJid = mXmppManager.getFullOtherJid();
 
+		LOGGER.info("Requesting read out from " + fullOtherJid);
+
 		IoTDataManager iotDataManager = IoTDataManager.getInstanceFor(connection);
-		List<IoTFieldsExtension> res;
+		final List<IoTFieldsExtension> res;
 		try {
 			res = iotDataManager.requestMomentaryValuesReadOut(fullOtherJid);
 		} catch (SmackException.NoResponseException | XMPPException.XMPPErrorException | SmackException.NotConnectedException |InterruptedException e) {
@@ -69,5 +77,14 @@ public class XmppIotDataControl {
 			return;
 		}
 
+		final List<? extends IoTDataField> dataFields = res.get(0).getNodes().get(0).getTimestampElements().get(0).getDataFields();
+
+		mXmppManager.withMainActivity((ma) -> {
+			ma.mIotSensorsLinearLayout.removeAllViews();
+			for (IoTDataField field : dataFields) {
+				IotSensorView iotSensorView = new IotSensorView(ma, field.getName(), field.getValueString());
+				ma.mIotSensorsLinearLayout.addView(iotSensorView);
+			}
+		});
 	}
 }

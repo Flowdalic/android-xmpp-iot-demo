@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright ⓒ 2016 Florian Schmaus.
+  ~
+  ~ This file is part of XIOT.
+  ~
+  ~ XIOT is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ XIOT is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with XIOT.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_toStartOf="@+id/iot_sensor_space"
+        android:text="Sensor Name"
+        android:id="@+id/iot_sensor_name_text_view"/>
+
+    <Space
+        android:layout_width="20dp"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:id="@+id/iot_sensor_space"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/iot_sensor_space"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Sensor Value"
+        android:id="@+id/iot_sensor_value_text_view"/>                android:layout_width="match_parent"
+
+</RelativeLayout>

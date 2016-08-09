@@ -41,6 +41,8 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jxmpp.jid.EntityFullJid;
 import org.jxmpp.jid.Jid;
+import org.jxmpp.jid.parts.Resourcepart;
+import org.jxmpp.stringprep.XmppStringprepException;
 
 import java.util.Collection;
 import java.util.logging.Level;
@@ -98,6 +100,14 @@ public class XmppManager implements RosterListener, ConnectionListener {
 		}
 
 		builder.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
+
+		try {
+			builder.setResource(Resourcepart.from("Smack"));
+		} catch (XmppStringprepException e) {
+			throw new IllegalStateException(e);
+		}
+
+		builder.setDebuggerEnabled(true);
 
 		XMPPTCPConnectionConfiguration conf = builder.build();
 
