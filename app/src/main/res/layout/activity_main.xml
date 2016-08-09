@@ -214,8 +214,14 @@
                 android:background="?android:attr/dividerHorizontal"
                 />
 
-            </LinearLayout>
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New Switch"
+                android:id="@+id/switch1"/>
 
+            </LinearLayout>
+        
     </LinearLayout>
 
 </RelativeLayout>
