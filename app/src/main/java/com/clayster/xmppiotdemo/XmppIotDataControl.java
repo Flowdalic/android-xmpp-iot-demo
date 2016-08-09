@@ -22,9 +22,13 @@ package com.clayster.xmppiotdemo;
 import android.content.Context;
 
 import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException.XMPPErrorException;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.util.Async;
+import org.jivesoftware.smackx.iot.control.IoTControlManager;
+import org.jivesoftware.smackx.iot.control.element.IoTSetResponse;
+import org.jivesoftware.smackx.iot.control.element.SetBoolData;
 import org.jivesoftware.smackx.iot.data.IoTDataManager;
 import org.jivesoftware.smackx.iot.data.element.IoTDataField;
 import org.jivesoftware.smackx.iot.data.element.IoTFieldsExtension;
@@ -34,7 +38,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class XmppIotDataControl {
+public class XmppIotDataControl implements XmppManager.XmppConnectionListener {
 
 	private static final Logger LOGGER = Logger.getLogger(XmppIotThing.class.getName());
 
@@ -47,22 +51,96 @@ public class XmppIotDataControl {
 		return INSTANCE;
 	}
 
+	private final Object mMainActivityLock = new Object();
+	private MainActivity mMainActivity;
+
 	private final Context mContext;
 	private final XmppManager mXmppManager;
 	private final Settings mSettings;
 
+	private volatile boolean mContinousReadOut;
 
 	private XmppIotDataControl(Context context) {
 		mContext = context.getApplicationContext();
 		mXmppManager = XmppManager.getInstance(mContext);
 		mSettings = Settings.getInstance(mContext);
+		mXmppManager.addXmppConnectionStatusListener(this);
 	}
 
-	void performReadOutAsync() {
+	@Override
+	public void newConnection(XMPPConnection connection) {
+
+	}
+	@Override
+	public void authenticated(XMPPConnection connection) {
+		withMainActivity((ma) -> setGuiElements(ma, true));
+	}
+
+	@Override
+	public void disconnected(XMPPConnection connection) {
+		withMainActivity((ma) -> setGuiElements(ma, false));
+	}
+
+	private static void setGuiElements(MainActivity ma, boolean enabled) {
+		ma.mReadOutButton.setEnabled(enabled);
+		ma.mContinousReadOutSwitch.setEnabled(enabled);
+		ma.mControlSwitch.setEnabled(enabled);
+	}
+
+	void mainActivityOnCreate(MainActivity mainActivity) {
+		this.mMainActivity = mainActivity;
+
+		mMainActivity.mReadOutButton.setOnClickListener((button) -> performReadOutAsync());
+		mMainActivity.mControlSwitch.setOnCheckedChangeListener((button, isChecked) -> controlNotificationAlarmAsync(isChecked));
+		mMainActivity.mContinousReadOutSwitch.setOnCheckedChangeListener((button, isChecked) -> setContinousReadOut(isChecked));
+
+		boolean connectionUsable = mXmppManager.isConnectionUseable();
+	    setGuiElements(mainActivity, connectionUsable);
+	}
+
+	void mainActivityOnDestroy(MainActivity mainActivity) {
+		assert (this.mMainActivity == mainActivity);
+
+		synchronized (mMainActivityLock) {
+			this.mMainActivity = null;
+		}
+	}
+
+	private void withMainActivity(final WithActivity<MainActivity> withMainActivity) {
+		synchronized (mMainActivityLock) {
+			if (mMainActivity == null) return;
+			mMainActivity.runOnUiThread(() -> withMainActivity.withActivity(mMainActivity));
+		}
+	}
+
+	private void setContinousReadOut(boolean continousReadOut) {
+		if (mContinousReadOut == continousReadOut) return;
+		mContinousReadOut = continousReadOut;
+		if (mContinousReadOut) {
+			performContiniousReadOut();
+		}
+	}
+
+	private void performContiniousReadOut() {
+		Async.go(() -> {
+			if (!mContinousReadOut) return;
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				LOGGER.log(Level.INFO, "Interrupted", e);
+			}
+			if (mContinousReadOut) {
+				performReadOut();
+				performContiniousReadOut();
+			}
+		});
+	}
+
+	private void performReadOutAsync() {
 		Async.go(() -> performReadOut());
 	}
 
-	void performReadOut() {
+	private void performReadOut() {
 		XMPPTCPConnection connection = mXmppManager.getXmppConnection();
 		EntityFullJid fullOtherJid = mXmppManager.getFullOtherJid();
 
@@ -72,7 +150,7 @@ public class XmppIotDataControl {
 		final List<IoTFieldsExtension> res;
 		try {
 			res = iotDataManager.requestMomentaryValuesReadOut(fullOtherJid);
-		} catch (SmackException.NoResponseException | XMPPException.XMPPErrorException | SmackException.NotConnectedException |InterruptedException e) {
+		} catch (SmackException.NoResponseException | XMPPErrorException | SmackException.NotConnectedException |InterruptedException e) {
 			LOGGER.log(Level.WARNING, "Could not perform read out", e);
 			return;
 		}
@@ -86,5 +164,23 @@ public class XmppIotDataControl {
 				ma.mIotSensorsLinearLayout.addView(iotSensorView);
 			}
 		});
+	}
+
+	private void controlNotificationAlarmAsync(boolean torchMode) {
+		Async.go(() -> controlNotificationAlarm(torchMode));
+	}
+
+	private void controlNotificationAlarm(boolean torchMode) {
+		final XMPPTCPConnection connection = mXmppManager.getXmppConnection();
+		final EntityFullJid fullOtherJid = mXmppManager.getFullOtherJid();
+
+		SetBoolData setTorch = new SetBoolData(Constants.NOTIFICATION_ALARM, torchMode);
+		IoTControlManager ioTControlManager = IoTControlManager.getInstanceFor(connection);
+
+		try {
+			final IoTSetResponse ioTSetResponse = ioTControlManager.setUsingIq(fullOtherJid, setTorch);
+		} catch (SmackException.NoResponseException | XMPPErrorException | SmackException.NotConnectedException | InterruptedException e) {
+			LOGGER.log(Level.SEVERE, "Could not set data", e);
+		}
 	}
 }

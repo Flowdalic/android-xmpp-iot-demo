@@ -19,19 +19,19 @@
 
 package com.clayster.xmppiotdemo;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.BatteryManager;
 
-import org.asmack.core.AndroidSmackManager;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smackx.iot.Thing;
 import org.jivesoftware.smackx.iot.control.IoTControlManager;
 import org.jivesoftware.smackx.iot.control.ThingControlRequest;
@@ -48,7 +48,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlRequest, SensorEventListener {
+public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlRequest, SensorEventListener, XmppManager.XmppConnectionListener {
 
 	private static final String MANUFACTURER = "Clayster AB";
 	private static final String MODEL = "XMPP IoT Demo";
@@ -77,6 +77,8 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 
 	private final Sensor mGravitySensor;
 
+	private final NotificationManager mNotificationManager;
+
 	private XmppIotThing(Context context) {
 		mContext = context.getApplicationContext();
 		mThing = Thing.builder()
@@ -93,6 +95,8 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 		mTemperatureSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
 		mGravitySensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
 
+		mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+
 		if (mTemperatureSensor != null) {
 			mSensorManager.registerListener(this, mTemperatureSensor, SensorManager.SENSOR_DELAY_NORMAL);
 		} else {
@@ -105,18 +109,26 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 			LOGGER.info("No gravity sensor found");
 		}
 
-		AndroidSmackManager androidSmackManager = AndroidSmackManager.getInstance(context);
-		androidSmackManager.addNewManagedConnectionListener((connection) -> {
-			onNewConnection(connection);
-		});
+		XmppManager.getInstance(mContext).addXmppConnectionStatusListener(this);
 	}
 
-	private void onNewConnection(XMPPTCPConnection connection) {
+	@Override
+	public void newConnection(XMPPConnection connection) {
 		IoTDataManager iotDataManager = IoTDataManager.getInstanceFor(connection);
 		iotDataManager.installThing(mThing);
 		IoTControlManager ioTControlManager = IoTControlManager.getInstanceFor(connection);
 		ioTControlManager.installThing(mThing);
 //		IoTProvisioningManager ioTProvisioningManager = IoTProvisioningManager.getInstanceFor(connection);
+	}
+
+	@Override
+	public void authenticated(XMPPConnection connection) {
+
+	}
+
+	@Override
+	public void disconnected(XMPPConnection connection) {
+
 	}
 
 	@Override
@@ -145,7 +157,7 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 		SetBoolData flashControlData = null;
 		for (SetData setData : setDatas) {
 			if (!(setData instanceof  SetBoolData)) continue;
-			if (!setData.getName().equals("flashlight")) continue;
+			if (!setData.getName().equals(Constants.NOTIFICATION_ALARM)) continue;
 			flashControlData = (SetBoolData) setData;
 			break;
 		}
@@ -155,9 +167,9 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 		}
 
 		if (flashControlData.getBooleanValue()) {
-			setFlashLightState(FlashLightState.on);
+			setNotifcationAlarm(NotificationAlarm.on);
 		} else {
-			setFlashLightState(FlashLightState.off);
+			setNotifcationAlarm(NotificationAlarm.off);
 		}
 	}
 
@@ -198,38 +210,35 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 		dataFields.add(batteryPercentField);
 	}
 
-	private enum FlashLightState {
+	private enum NotificationAlarm {
 		on,
 		off,
 		;
 	}
 
-	private Camera mCamera;
-	private FlashLightState mFlashLightState = FlashLightState.off;
+	private NotificationAlarm mNotificationAlarm = NotificationAlarm.off;
 
 
-	private void setFlashLightState(FlashLightState flashLightState) {
-		if (mFlashLightState == flashLightState) return;
+	private void setNotifcationAlarm(NotificationAlarm notificationAlarm) {
+		if (mNotificationAlarm == notificationAlarm) return;
 
-		switch (flashLightState) {
+		switch (notificationAlarm) {
 			case on:
-				if (mCamera != null) {
-					mCamera.release();
-				}
-				mCamera = Camera.open();
-				Camera.Parameters parameters = mCamera.getParameters();
-				parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-				mCamera.setParameters(parameters);
-				mCamera.startPreview();
-				mFlashLightState = flashLightState;
+				Notification.Builder builder = new Notification.Builder(mContext);
+				builder.setContentTitle("XIOT Notification Alarm")
+						.setContentText("XIOT Notification Alarm enabled!")
+						.setDefaults(Notification.DEFAULT_LIGHTS)
+						.setLights(0xff00ff00, 300, 100)
+						.setAutoCancel(true)
+						;
+
+				mNotificationManager.notify(0, builder.build());
+
+				mNotificationAlarm = notificationAlarm;
 				break;
 			case off:
-				if (mCamera == null) {
-					break;
-				}
-				mCamera.startPreview();
-				mCamera.release();
-				mFlashLightState = flashLightState;
+				mNotificationManager.cancelAll();
+				mNotificationAlarm = notificationAlarm;
 				break;
 		}
 	}

@@ -45,6 +45,8 @@ import org.jxmpp.jid.parts.Resourcepart;
 import org.jxmpp.stringprep.XmppStringprepException;
 
 import java.util.Collection;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -113,6 +115,10 @@ public class XmppManager implements RosterListener, ConnectionListener {
 
 		xmppConnection = asmackManager.createManagedConnection(conf);
 
+		for (XmppConnectionListener listener : mXmppConnectionStatusListeners) {
+			listener.newConnection(xmppConnection);
+		}
+
 		roster = Roster.getInstanceFor(xmppConnection);
 		roster.setSubscribeListener((from, presence) -> {
 			if (from.equals(settings.getOtherJid())) {
@@ -133,6 +139,11 @@ public class XmppManager implements RosterListener, ConnectionListener {
 
 	public void disable() {
 		asmackManager.disable();
+	}
+
+	boolean isConnectionUseable() {
+		final XMPPTCPConnection connection = xmppConnection;
+		return connection != null && connection.isAuthenticated();
 	}
 
 	void mainActivityOnCreate(MainActivity mainActivity) {
@@ -202,9 +213,10 @@ public class XmppManager implements RosterListener, ConnectionListener {
 		connection.addAsyncStanzaListener(mMessageListener, MessageWithBodiesFilter.INSTANCE);
 		withMainActivity((ma) -> {
 					ma.myJidPresenceImageView.setImageDrawable(mOnlineDrawable);
-					ma.mReadOutButton.setEnabled(true);
-					ma.mContinousReadOutSwitch.setEnabled(true);
 				});
+		for (XmppConnectionListener listener : mXmppConnectionStatusListeners) {
+			listener.authenticated(connection);
+		}
 	}
 
 	@Override
@@ -221,9 +233,10 @@ public class XmppManager implements RosterListener, ConnectionListener {
 		xmppConnection.removeAsyncStanzaListener(mMessageListener);
 		withMainActivity((ma) -> {
 			ma.myJidPresenceImageView.setImageDrawable(mOfflineDrawable);
-			ma.mReadOutButton.setEnabled(false);
-			ma.mContinousReadOutSwitch.setEnabled(false);
 		});
+		for (XmppConnectionListener listener : mXmppConnectionStatusListeners) {
+			listener.disconnected(xmppConnection);
+		}
 	}
 
 	@Override
@@ -254,14 +267,10 @@ public class XmppManager implements RosterListener, ConnectionListener {
 		);
 	}
 
-	interface WithMainActivity {
-		void withMainActivity(MainActivity mainActivity);
-	}
-
-	void withMainActivity(final WithMainActivity withMainActivity) {
+	void withMainActivity(final WithActivity<MainActivity> withMainActivity) {
 		synchronized (mainActivityLock) {
 			if (mainActivity == null) return;
-			mainActivity.runOnUiThread(() -> withMainActivity.withMainActivity(mainActivity));
+			mainActivity.runOnUiThread(() -> withMainActivity.withActivity(mainActivity));
 		}
 	}
 
@@ -275,5 +284,21 @@ public class XmppManager implements RosterListener, ConnectionListener {
 
 	XMPPTCPConnection getXmppConnection() {
 		return xmppConnection;
+	}
+
+	private final Set<XmppConnectionListener> mXmppConnectionStatusListeners = new CopyOnWriteArraySet<>();
+
+	boolean addXmppConnectionStatusListener(XmppConnectionListener listener) {
+		return mXmppConnectionStatusListeners.add(listener);
+	}
+
+	boolean removeXmppConnectionStatusListener(XmppConnectionListener listener) {
+		return mXmppConnectionStatusListeners.remove(listener);
+	}
+
+	interface XmppConnectionListener {
+		void newConnection(XMPPConnection connection);
+		void authenticated(XMPPConnection connection);
+		void disconnected(XMPPConnection connection);
 	}
 }

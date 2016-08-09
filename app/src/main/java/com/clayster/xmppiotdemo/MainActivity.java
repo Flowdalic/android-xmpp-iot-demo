@@ -44,11 +44,15 @@ public class MainActivity extends AppCompatActivity {
 	private TextView mOtherJidTextView;
 
 	private XmppManager xmppManager;
+	private XmppIotDataControl mXmppIotDataControl;
+	private XmppIotThing mXmppIotThing;
 
 	ImageView myJidPresenceImageView;
 	ImageView otherJidPresenceImageView;
 	Button mReadOutButton;
 	Switch mContinousReadOutSwitch;
+
+	Switch mControlSwitch;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -66,19 +70,20 @@ public class MainActivity extends AppCompatActivity {
 		otherJidPresenceImageView = (ImageView) findViewById(R.id.other_jid_presence_image_view);
 		mReadOutButton = (Button) findViewById(R.id.read_out_button);
 		mContinousReadOutSwitch = (Switch) findViewById(R.id.continues_read_out_switch);
+		mControlSwitch = (Switch) findViewById(R.id.control_switch);
 
 		Toolbar mainToolbar = (Toolbar) findViewById(R.id.mainToolbar);
 		setSupportActionBar(mainToolbar);
 
 		settings = Settings.getInstance(this);
 
-		XmppIotThing.getInstance(this);
+		mXmppIotThing = XmppIotThing.getInstance(this);
 
 		xmppManager = XmppManager.getInstance(this);
 		xmppManager.mainActivityOnCreate(this);
 
-		XmppIotDataControl xmppIotDataControl = XmppIotDataControl.getInstance(this);
-		mReadOutButton.setOnClickListener((button) -> xmppIotDataControl.performReadOutAsync());
+		mXmppIotDataControl = XmppIotDataControl.getInstance(this);
+		mXmppIotDataControl.mainActivityOnCreate(this);
 	}
 
 	public void configureButtonClicked(View view) {
@@ -136,5 +141,6 @@ public class MainActivity extends AppCompatActivity {
 	public void onDestroy() {
 		super.onDestroy();
 		xmppManager.mainActivityOnDestroy(this);
+		mXmppIotDataControl.mainActivityOnDestroy(this);
 	}
 }
