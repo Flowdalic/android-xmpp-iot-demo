@@ -230,6 +230,7 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 						.setDefaults(Notification.DEFAULT_LIGHTS)
 						.setLights(0xff00ff00, 300, 100)
 						.setAutoCancel(true)
+						.setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
 						;
 
 				mNotificationManager.notify(0, builder.build());
