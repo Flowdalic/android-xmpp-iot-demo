@@ -1,1 +1,1 @@
-include ':app', ':aSmack'
+include ':app' ,':aSmack', ':MemorizingTrustManager'

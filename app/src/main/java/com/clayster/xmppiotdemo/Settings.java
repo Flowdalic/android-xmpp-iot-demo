@@ -35,8 +35,9 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.X509TrustManager;
 
-import eu.geekplace.javapinning.JavaPinning;
+import de.duenndns.ssl.MemorizingTrustManager;
 
 public class Settings {
 
@@ -54,6 +55,7 @@ public class Settings {
 	private static final String OTHER_JID_KEY = "OTHER_JID";
 
 	private final SharedPreferences preferences;
+	private final MemorizingTrustManager mMemorizingTrustManager;
 
 	private EntityBareJid myJidCache;
 	private EntityBareJid otherJidCache;
@@ -61,6 +63,7 @@ public class Settings {
 
 	private Settings(Context context) {
 		this.preferences = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+		mMemorizingTrustManager = new MemorizingTrustManager(context.getApplicationContext());
 	}
 
 	public void saveBasics(@NonNull EntityBareJid myJid, @NonNull CharSequence password, @NonNull EntityBareJid otherJid) {
@@ -88,9 +91,11 @@ public class Settings {
 			builder.setXmppDomain(getMyJid().asDomainBareJid());
 
 			builder.setSecurityMode(ConnectionConfiguration.SecurityMode.required);
-			SSLContext sc = null;
+
+			SSLContext sc;
 			try {
-				sc = JavaPinning.forPin("SHA256:e3b1812d945da1a2a2c5fa28029d2fe34c7c4142fb098f5cfedff1ff20e98781");
+				sc = SSLContext.getInstance("TLS");
+				sc.init(null, new X509TrustManager[] { mMemorizingTrustManager }, new java.security.SecureRandom());
 			} catch (KeyManagementException | NoSuchAlgorithmException e) {
 				throw new IllegalStateException(e);
 			}

@@ -31,6 +31,11 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -45,7 +50,9 @@ android {
 dependencies {
     testCompile 'junit:junit:4.12'
     compile project(":aSmack")
+    compile project(":MemorizingTrustManager")
     compile 'com.android.support:appcompat-v7:24.1.1'
     compile 'com.android.support:design:24.1.1'
-    compile 'eu.geekplace.javapinning:java-pinning-aar:1.0.1'
+    // Disabled java-pinning is currently not used as we use the MemorizingTrustManager
+//    compile 'eu.geekplace.javapinning:java-pinning-aar:1.0.1'
 }
