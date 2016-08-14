@@ -79,6 +79,9 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 
 	private final NotificationManager mNotificationManager;
 
+	private final Object mMainActivityLock = new Object();
+	private MainActivity mMainActivity;
+
 	private XmppIotThing(Context context) {
 		mContext = context.getApplicationContext();
 		mThing = Thing.builder()
@@ -248,6 +251,27 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 				mNotificationManager.cancelAll();
 				mNotificationAlarm = notificationAlarm;
 				break;
+		}
+	}
+
+	void mainActivityOnCreate(MainActivity mainActivity) {
+		this.mMainActivity = mainActivity;
+
+
+	}
+
+	void mainActivityOnDestroy(MainActivity mainActivity) {
+		assert (this.mMainActivity == mainActivity);
+
+		synchronized (mMainActivityLock) {
+			this.mMainActivity = null;
+		}
+	}
+
+	private void withMainActivity(final WithActivity<MainActivity> withMainActivity) {
+		synchronized (mMainActivityLock) {
+			if (mMainActivity == null) return;
+			mMainActivity.runOnUiThread(() -> withMainActivity.withActivity(mMainActivity));
 		}
 	}
 }

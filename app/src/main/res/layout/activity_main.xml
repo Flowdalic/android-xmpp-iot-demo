@@ -135,82 +135,118 @@
             android:layout_height="9dp"
             />
 
-
-        <TextView
-            android:id="@+id/data_section_headline_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="XEP-0323: Data"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:background="?android:attr/dividerHorizontal"
-            />
-
-        <RelativeLayout
-            android:id="@+id/data_gui_elements_relative_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Button
-                android:id="@+id/read_out_button"
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:enabled="false"
-                android:minHeight="0dp"
-                android:text="Read out"/>
-
-            <Switch
-                android:id="@+id/continues_read_out_switch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_toEndOf="@+id/read_out_button"
-                android:enabled="false"
-                android:gravity="right"
-                android:text="Continuous"
-                android:textAppearance="?android:attr/textAppearanceMedium"/>
-        </RelativeLayout>
-
         <LinearLayout
-            android:id="@+id/iot_sensors_linear_layout"
+            android:id="@+id/app_gui_elements_linear_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/data_section_headline_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="No data read-out so far."/>
+                android:text="XEP-0323: Data"
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:background="?android:attr/dividerHorizontal"
+                />
+
+            <RelativeLayout
+                android:id="@+id/data_gui_elements_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/read_out_button"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:enabled="false"
+                    android:minHeight="0dp"
+                    android:text="Read out"/>
+
+                <Switch
+                    android:id="@+id/continues_read_out_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_toEndOf="@+id/read_out_button"
+                    android:enabled="false"
+                    android:gravity="right"
+                    android:text="Continuous"
+                    android:textAppearance="?android:attr/textAppearanceMedium"/>
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/iot_sensors_linear_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No data read-out so far."/>
+
+            </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="9dp"/>
+
+            <TextView
+                android:id="@+id/control_section_headline_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="XEP-0325: Control"
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:background="?android:attr/dividerHorizontal"
+                />
+
+            <Switch
+                android:id="@+id/control_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Notification Alarm"/>
 
         </LinearLayout>
 
-        <Space
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="9dp"/>
-
-        <TextView
-            android:id="@+id/control_section_headline_text_view"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="XEP-0325: Control"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
+            android:orientation="vertical"
+            android:id="@+id/thing_gui_elements_linear_layout">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:background="?android:attr/dividerHorizontal"
-            />
+            <TextView
+                android:id="@+id/thing_information_headline_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Thing Information"
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-        <Switch
-            android:id="@+id/control_switch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Notification Alarm"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:background="?android:attr/dividerHorizontal"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:id="@+id/thing_information_infos_linear_layout">
+
+            </LinearLayout>
+
+        </LinearLayout>
 
     </LinearLayout>
 

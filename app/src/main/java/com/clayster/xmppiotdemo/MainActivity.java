@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
 	private LinearLayout setupLinearLayout;
 	private LinearLayout controlLinearLayout;
 	LinearLayout mIotSensorsLinearLayout;
+	LinearLayout mIotThingInfosLinearLayout;
 
 	private TextView mMyJidTextView;
 	private TextView mOtherJidTextView;
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
 		settings = Settings.getInstance(this);
 
 		mXmppIotThing = XmppIotThing.getInstance(this);
+		mXmppIotDataControl.mainActivityOnCreate(this);
 
 		xmppManager = XmppManager.getInstance(this);
 		xmppManager.mainActivityOnCreate(this);
@@ -142,5 +144,6 @@ public class MainActivity extends AppCompatActivity {
 		super.onDestroy();
 		xmppManager.mainActivityOnDestroy(this);
 		mXmppIotDataControl.mainActivityOnDestroy(this);
+		mXmppIotThing.mainActivityOnDestroy(this);
 	}
 }

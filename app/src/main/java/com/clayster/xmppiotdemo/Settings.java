@@ -53,6 +53,7 @@ public class Settings {
 	private static final String MY_JID_KEY = "MY_JID";
 	private static final String PASSWORD_KEY = "PASSWORD";
 	private static final String OTHER_JID_KEY = "OTHER_JID";
+	private static final String IDENTIY_MODE_KEY = "IDENTITY_MODE";
 
 	private final SharedPreferences preferences;
 	private final MemorizingTrustManager mMemorizingTrustManager;
@@ -145,5 +146,43 @@ public class Settings {
 
 		String otherJid = preferences.getString(OTHER_JID_KEY, null);
 		if (otherJid != null) otherJidText.setText(otherJid);
+	}
+
+	enum IdentityMode {
+		app,
+		thing,
+		both,
+	}
+
+	public void setIdentityMode(IdentityMode identityMode) {
+		preferences.edit().putInt(IDENTIY_MODE_KEY, identityMode.ordinal()).commit();
+	}
+
+	public IdentityMode getIdentityMode() {
+		int identityModeInt = preferences.getInt(IDENTIY_MODE_KEY, -1);
+		if (identityModeInt == -1) {
+			return IdentityMode.both;
+		}
+		return IdentityMode.values()[identityModeInt];
+	}
+
+	public boolean isIdentityModeApp() {
+		switch (getIdentityMode()) {
+			case app:
+			case both:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	public boolean isIdentityModeThing() {
+		switch (getIdentityMode()) {
+			case thing:
+			case both:
+				return true;
+			default:
+				return false;
+		}
 	}
 }
