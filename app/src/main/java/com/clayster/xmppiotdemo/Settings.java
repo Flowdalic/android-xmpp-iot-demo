@@ -53,7 +53,8 @@ public class Settings {
 	private static final String MY_JID_KEY = "MY_JID";
 	private static final String PASSWORD_KEY = "PASSWORD";
 	private static final String OTHER_JID_KEY = "OTHER_JID";
-	private static final String IDENTIY_MODE_KEY = "IDENTITY_MODE";
+
+	private static final String IDENTIY_MODE_KEY = "pref_identityMode";
 
 	private final SharedPreferences preferences;
 	private final MemorizingTrustManager mMemorizingTrustManager;
@@ -154,16 +155,18 @@ public class Settings {
 		both,
 	}
 
-	public void setIdentityMode(IdentityMode identityMode) {
-		preferences.edit().putInt(IDENTIY_MODE_KEY, identityMode.ordinal()).commit();
-	}
-
 	public IdentityMode getIdentityMode() {
-		int identityModeInt = preferences.getInt(IDENTIY_MODE_KEY, -1);
-		if (identityModeInt == -1) {
-			return IdentityMode.both;
+		String identityMode = preferences.getString(IDENTIY_MODE_KEY, "both");
+		switch (identityMode) {
+			case "both":
+				return IdentityMode.both;
+			case "app":
+				return IdentityMode.app;
+			case "thing":
+				return IdentityMode.thing;
+			default:
+				throw new IllegalStateException();
 		}
-		return IdentityMode.values()[identityModeInt];
 	}
 
 	public boolean isIdentityModeApp() {

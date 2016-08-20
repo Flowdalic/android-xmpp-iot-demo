@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright ⓒ 2016 Florian Schmaus.
+  ~
+  ~ This file is part of XIOT.
+  ~
+  ~ XIOT is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ XIOT is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with XIOT.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference
+        android:title="Setup connection settings">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.clayster.xmppiotdemo"
+            android:targetClass="com.clayster.xmppiotdemo.Setup"/>
+    </Preference>
+
+    <ListPreference
+        android:key="pref_identityMode"
+        android:title="Identity"
+        android:entries="@array/pref_identityMode_entries"
+        android:entryValues="@array/pref_identityMode_values"
+        android:defaultValue="@string/pref_identityMode_default" />
+
+</PreferenceScreen>

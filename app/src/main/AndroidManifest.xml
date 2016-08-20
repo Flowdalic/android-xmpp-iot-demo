@@ -24,6 +24,8 @@
         </activity>
         <activity android:name=".Setup">
         </activity>
+        <activity android:name=".SettingsActivity">
+        </activity>
     </application>
 
 </manifest>

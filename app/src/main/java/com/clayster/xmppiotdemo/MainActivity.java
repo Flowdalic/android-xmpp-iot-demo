@@ -21,6 +21,7 @@ package com.clayster.xmppiotdemo;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -97,10 +98,12 @@ public class MainActivity extends AppCompatActivity {
 		Toolbar mainToolbar = (Toolbar) findViewById(R.id.mainToolbar);
 		setSupportActionBar(mainToolbar);
 
+		PreferenceManager.setDefaultValues(this, R.xml.xiot_preferences, false);
+
 		settings = Settings.getInstance(this);
 
 		mXmppIotThing = XmppIotThing.getInstance(this);
-		mXmppIotDataControl.mainActivityOnCreate(this);
+		mXmppIotThing.mainActivityOnCreate(this);
 
 		xmppManager = XmppManager.getInstance(this);
 		xmppManager.mainActivityOnCreate(this);
@@ -133,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
 		boolean res = false;
 		switch (item.getItemId()) {
 			case R.id.action_settings:
-				startActivity(new Intent(this, Setup.class));
+				startActivity(new Intent(this, SettingsActivity.class));
 				res = true;
 				break;
 		}
