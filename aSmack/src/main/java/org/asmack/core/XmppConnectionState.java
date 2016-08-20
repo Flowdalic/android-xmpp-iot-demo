@@ -19,9 +19,13 @@
 
 package org.asmack.core;
 
-public class XmppConnectionStatus {
-
-	private XmppConnectionState state;
-	private String optionalInfo;
-
+public enum XmppConnectionState {
+	Connecting,
+	Connected,
+	Authenticated,
+	Disconnecting,
+	Disconnected,
+	InstantDisconnected,
+	WaitingForNetwork,
+	WaitingForRetry,
 }

@@ -45,7 +45,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/controlLayout"
+        android:id="@+id/main_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/setup_linear_layout"
@@ -136,7 +136,7 @@
             />
 
         <LinearLayout
-            android:id="@+id/app_gui_elements_linear_layout"
+            android:id="@+id/app_identity_linear_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -223,7 +223,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:id="@+id/thing_gui_elements_linear_layout">
+            android:id="@+id/thing_identity_linear_layout">
 
             <TextView
                 android:id="@+id/thing_information_headline_text_view"

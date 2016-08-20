@@ -36,8 +36,26 @@ public class MainActivity extends AppCompatActivity {
 
 	private Settings settings;
 
-	private LinearLayout setupLinearLayout;
-	private LinearLayout controlLinearLayout;
+	/**
+	 * The GUI elements shown if XIOT is not configured yet.
+	 */
+	private LinearLayout mSetupLinearLayout;
+
+	/**
+	 * The GUI elements shown after XIOT has been configured.
+	 */
+	private LinearLayout mMainLinearLayout;
+
+	/**
+	 * The GUI elements used by the 'app' identity.
+	 */
+	private LinearLayout mAppIdentityLinearLayout;
+
+	/**
+	 * The GUI elements used by the 'thing' identity.
+	 */
+	private LinearLayout mThingIdentityLinearLayout;
+
 	LinearLayout mIotSensorsLinearLayout;
 	LinearLayout mIotThingInfosLinearLayout;
 
@@ -60,8 +78,11 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		setupLinearLayout = (LinearLayout) findViewById(R.id.setup_linear_layout);
-		controlLinearLayout = (LinearLayout) findViewById(R.id.controlLayout);
+		mThingIdentityLinearLayout = (LinearLayout) findViewById(R.id.thing_identity_linear_layout);
+		mAppIdentityLinearLayout = (LinearLayout) findViewById(R.id.app_identity_linear_layout);
+
+		mSetupLinearLayout = (LinearLayout) findViewById(R.id.setup_linear_layout);
+		mMainLinearLayout = (LinearLayout) findViewById(R.id.main_linear_layout);
 		mIotSensorsLinearLayout = (LinearLayout) findViewById(R.id.iot_sensors_linear_layout);
 
 		mMyJidTextView = (TextView) findViewById(R.id.my_jid_text_view);
@@ -123,12 +144,18 @@ public class MainActivity extends AppCompatActivity {
 	public void onResume() {
 		super.onResume();
 		if (settings.isBasicConfigurationDone()) {
-			setupLinearLayout.setVisibility(View.GONE);
-			controlLinearLayout.setVisibility(View.VISIBLE);
+			mSetupLinearLayout.setVisibility(View.GONE);
+			mMainLinearLayout.setVisibility(View.VISIBLE);
 		} else {
-			setupLinearLayout.setBackgroundColor(View.VISIBLE);
-			controlLinearLayout.setVisibility(View.GONE);
+			mSetupLinearLayout.setBackgroundColor(View.VISIBLE);
+			mMainLinearLayout.setVisibility(View.GONE);
 		}
+
+		int appIdentityVisibility = settings.isIdentityModeApp() ? View.VISIBLE : View.GONE;
+		mAppIdentityLinearLayout.setVisibility(appIdentityVisibility);
+
+		int thingIdentityVisibility = settings.isIdentityModeThing() ? View.VISIBLE : View.GONE;
+		mThingIdentityLinearLayout.setVisibility(thingIdentityVisibility);
 
 		if (settings.getOtherJid() != null) {
 			mOtherJidTextView.setText(settings.getOtherJid());

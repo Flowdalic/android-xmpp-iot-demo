@@ -25,6 +25,7 @@ import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import org.asmack.core.AndroidSmackManager;
+import org.asmack.core.XmppConnectionState;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
@@ -69,6 +70,7 @@ public class XmppManager implements RosterListener, ConnectionListener {
 
 	private XMPPTCPConnectionConfiguration.Builder usedBuilder;
 	private XMPPTCPConnection xmppConnection;
+	private volatile XmppConnectionState mXmppConnectionState = XmppConnectionState.Disconnected;
 	private Roster roster;
 
 	private final Object mainActivityLock = new Object();
@@ -156,6 +158,8 @@ public class XmppManager implements RosterListener, ConnectionListener {
 		boolean connectionUsable = xmppConnection.isAuthenticated();
 		mainActivity.mReadOutButton.setEnabled(connectionUsable);
 		mainActivity.mContinousReadOutSwitch.setEnabled(connectionUsable);
+		maybeSetOtherJidPresenceGui();
+		maybeUpdateConnectionStateGui();
 	}
 
 	void mainActivityOnDestroy(MainActivity mainActivity) {
@@ -184,12 +188,12 @@ public class XmppManager implements RosterListener, ConnectionListener {
 	@Override
 	public void presenceChanged(Presence presence) {
 		if (!presence.getFrom().asBareJid().equals(settings.getOtherJid())) return;
-		setOtherJidPresence();
+		maybeSetOtherJidPresenceGui();
 	}
 
 	@Override
 	public void connected(XMPPConnection connection) {
-		withMainActivity((ma) -> ma.myJidPresenceImageView.setImageDrawable(mConnectingDrawlable));
+		setConnectionState(XmppConnectionState.Connected);
 	}
 
 	private final StanzaListener mMessageListener = (stanza) -> {
@@ -199,7 +203,7 @@ public class XmppManager implements RosterListener, ConnectionListener {
 
 	@Override
 	public void authenticated(XMPPConnection connection, boolean resumed) {
-		setOtherJidPresence();
+		maybeSetOtherJidPresenceGui();
 		RosterEntry otherJidEntry = roster.getEntry(settings.getOtherJid());
 
 		if (otherJidEntry == null || (!otherJidEntry.canSeeHisPresence() && !otherJidEntry.isSubscriptionPending())) {
@@ -211,9 +215,9 @@ public class XmppManager implements RosterListener, ConnectionListener {
 		}
 
 		connection.addAsyncStanzaListener(mMessageListener, MessageWithBodiesFilter.INSTANCE);
-		withMainActivity((ma) -> {
-					ma.myJidPresenceImageView.setImageDrawable(mOnlineDrawable);
-				});
+
+		setConnectionState(XmppConnectionState.Authenticated);
+
 		for (XmppConnectionListener listener : mXmppConnectionStatusListeners) {
 			listener.authenticated(connection);
 		}
@@ -231,9 +235,7 @@ public class XmppManager implements RosterListener, ConnectionListener {
 
 	private void connectionTerminated() {
 		xmppConnection.removeAsyncStanzaListener(mMessageListener);
-		withMainActivity((ma) -> {
-			ma.myJidPresenceImageView.setImageDrawable(mOfflineDrawable);
-		});
+		setConnectionState(XmppConnectionState.Disconnected);
 		for (XmppConnectionListener listener : mXmppConnectionStatusListeners) {
 			listener.disconnected(xmppConnection);
 		}
@@ -254,7 +256,7 @@ public class XmppManager implements RosterListener, ConnectionListener {
 
 	}
 
-	private void setOtherJidPresence() {
+	private void maybeSetOtherJidPresenceGui() {
 		Presence presence = roster.getPresence(settings.getOtherJid());
 		final Drawable drawable;
 		if (presence != null && presence.isAvailable()) {
@@ -300,5 +302,32 @@ public class XmppManager implements RosterListener, ConnectionListener {
 		void newConnection(XMPPConnection connection);
 		void authenticated(XMPPConnection connection);
 		void disconnected(XMPPConnection connection);
+	}
+
+	private void setConnectionState(XmppConnectionState state) {
+		mXmppConnectionState = state;
+	}
+
+	private void maybeUpdateConnectionStateGui() {
+		final Drawable drawable;
+		switch (mXmppConnectionState) {
+			case Connecting:
+			case Connected:
+				drawable = mConnectingDrawlable;
+				break;
+			case Authenticated:
+				drawable = mOnlineDrawable;
+				break;
+			default:
+				drawable = mOfflineDrawable;
+				break;
+		}
+		withMainActivity((ma) -> {
+			ma.myJidPresenceImageView.setImageDrawable(drawable);
+		});
+	}
+
+	XmppConnectionState getConnectionState() {
+		return mXmppConnectionState;
 	}
 }
