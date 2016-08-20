@@ -21,6 +21,7 @@ package com.clayster.xmppiotdemo;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.widget.EditText;
 
@@ -64,7 +65,7 @@ public class Settings {
 	private XMPPTCPConnectionConfiguration.Builder confBuilderCache;
 
 	private Settings(Context context) {
-		this.preferences = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+		this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		mMemorizingTrustManager = new MemorizingTrustManager(context.getApplicationContext());
 	}
 
