@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">XMPP IoT Demo</string>
+
+    <string-array name="pref_identityMode_entries">
+        <item>Both</item>
+        <item>App</item>
+        <item>Thing</item>
+    </string-array>
+
+</resources>

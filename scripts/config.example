@@ -1,0 +1,3 @@
+KEYSTOREDATA=~/Dropbox/development/xiot/keystore
+RELEASE_HOST=mate.geekplace.eu
+RELEASE_DIR=/var/vhosts/geekplace.eu/flow/projects/xiot/releases

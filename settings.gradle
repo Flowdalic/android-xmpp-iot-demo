@@ -1,0 +1,1 @@
+include ':app' ,':aSmack', ':MemorizingTrustManager'
