@@ -8,4 +8,4 @@ cache:
   directories:
   - $HOME/.m2
 
-script: gradle app:assembleDebug
+script: ./gradlew app:assembleDebug
