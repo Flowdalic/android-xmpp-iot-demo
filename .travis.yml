@@ -16,6 +16,6 @@ cache:
   - $HOME/.gradle/wrapper/
 
 before_script:
-- android update sdk --filter build-tools-24.0.1 --no-ui
+- android update sdk --no-ui --all --filter build-tools-24.0.1
 
 script: ./gradlew --stacktrace app:assembleDebug
