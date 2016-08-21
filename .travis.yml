@@ -1,7 +1,7 @@
 language: android
 android:
   components:
-    - android-19
+    - android-23
 
 sudo: false
 cache:
