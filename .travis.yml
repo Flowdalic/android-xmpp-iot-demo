@@ -1,7 +1,8 @@
 language: android
 android:
   components:
-    - android-23
+	- android-23
+	- android-24
 	- build-tools-24.0.1
 
 sudo: false
