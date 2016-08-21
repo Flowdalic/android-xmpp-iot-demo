@@ -1,0 +1,11 @@
+language: android
+android:
+  components:
+    - android-19
+
+sudo: false
+cache:
+  directories:
+  - $HOME/.m2
+
+script: gradle app:assembleDebug

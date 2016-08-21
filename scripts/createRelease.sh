@@ -33,6 +33,10 @@ done
 
 declare -r KEYSTORE_PROPERTIES_FILE="$BASEDIR/keystore.properties"
 
+TMPDIR=$(mktemp -d)
+# shellcheck disable=SC2064
+trap "rm -rf \"$TMPDIR\"" EXIT
+
 if $REMOTE; then
 	# shellcheck disable=SC2064
 	trap "rm \"$KEYSTORE_PROPERTIES_FILE\"" EXIT
