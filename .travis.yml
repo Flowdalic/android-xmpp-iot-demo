@@ -2,6 +2,7 @@ language: android
 android:
   components:
     - android-23
+	- build-tootls-24.0.1
 
 sudo: false
 cache:
