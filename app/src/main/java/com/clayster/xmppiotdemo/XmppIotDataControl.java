@@ -83,7 +83,7 @@ public class XmppIotDataControl implements XmppManager.XmppConnectionListener {
 
 	private static void setGuiElements(MainActivity ma, boolean enabled) {
 		ma.mReadOutButton.setEnabled(enabled);
-		ma.mContinousReadOutSwitch.setEnabled(enabled);
+		ma.mContiniousReadOutSwitch.setEnabled(enabled);
 		ma.mControlSwitch.setEnabled(enabled);
 	}
 
@@ -92,7 +92,7 @@ public class XmppIotDataControl implements XmppManager.XmppConnectionListener {
 
 		mMainActivity.mReadOutButton.setOnClickListener((button) -> performReadOutAsync());
 		mMainActivity.mControlSwitch.setOnCheckedChangeListener((button, isChecked) -> controlNotificationAlarmAsync(isChecked));
-		mMainActivity.mContinousReadOutSwitch.setOnCheckedChangeListener((button, isChecked) -> setContinousReadOut(isChecked));
+		mMainActivity.mContiniousReadOutSwitch.setOnCheckedChangeListener((button, isChecked) -> setContinousReadOut(isChecked));
 
 		boolean connectionUsable = mXmppManager.isConnectionUseable();
 	    setGuiElements(mainActivity, connectionUsable);

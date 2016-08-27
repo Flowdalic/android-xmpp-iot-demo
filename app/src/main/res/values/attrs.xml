@@ -19,8 +19,18 @@
   -->
 
 <resources>
+
+    <attr name="name" format="string" />
+    <attr name="value" format="string" />
+
     <declare-styleable name="IotSensor">
-        <attr name="name" format="string" />
-        <attr name="value" format="string" />
+        <attr name="name"/>
+        <attr name="value"/>
     </declare-styleable>
+
+    <declare-styleable name="IotThingInfo">
+        <attr name="name"/>
+        <attr name="value"/>
+    </declare-styleable>
+
 </resources>

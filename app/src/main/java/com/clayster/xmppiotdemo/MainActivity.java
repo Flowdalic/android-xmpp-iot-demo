@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 	ImageView myJidPresenceImageView;
 	ImageView otherJidPresenceImageView;
 	Button mReadOutButton;
-	Switch mContinousReadOutSwitch;
+	Switch mContiniousReadOutSwitch;
 
 	Switch mControlSwitch;
 
@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
 		mSetupLinearLayout = (LinearLayout) findViewById(R.id.setup_linear_layout);
 		mMainLinearLayout = (LinearLayout) findViewById(R.id.main_linear_layout);
 		mIotSensorsLinearLayout = (LinearLayout) findViewById(R.id.iot_sensors_linear_layout);
+		mIotThingInfosLinearLayout = (LinearLayout) findViewById(R.id.thing_information_infos_linear_layout);
 
 		mMyJidTextView = (TextView) findViewById(R.id.my_jid_text_view);
 		mOtherJidTextView = (TextView) findViewById(R.id.otherJidTextView);
@@ -92,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
 		myJidPresenceImageView = (ImageView) findViewById(R.id.my_jid_presence_image_view);
 		otherJidPresenceImageView = (ImageView) findViewById(R.id.other_jid_presence_image_view);
 		mReadOutButton = (Button) findViewById(R.id.read_out_button);
-		mContinousReadOutSwitch = (Switch) findViewById(R.id.continues_read_out_switch);
+		mContiniousReadOutSwitch = (Switch) findViewById(R.id.continues_read_out_switch);
 		mControlSwitch = (Switch) findViewById(R.id.control_switch);
 
 		Toolbar mainToolbar = (Toolbar) findViewById(R.id.mainToolbar);

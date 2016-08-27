@@ -19,7 +19,6 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
-
     <LinearLayout
         android:id="@+id/setup_linear_layout"
         android:layout_width="match_parent"
@@ -44,210 +43,215 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/main_linear_layout"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/setup_linear_layout"
-        android:orientation="vertical">
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="12dp"/>
-
-        <Switch
-            android:id="@+id/enableSwitch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="end"
-            android:onClick="enableSwitchToggled"
-            android:text="Enable"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="9dp"/>
-
-        <TextView
-            android:id="@+id/my_jid_headline_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="My JID"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center">
-
-            <TextView
-                android:id="@+id/my_jid_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:hint="My JID not set"
-                android:textAppearance="?android:attr/textAppearanceMedium"/>
-
-            <ImageView
-                android:id="@+id/my_jid_presence_image_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toEndOf="@+id/my_jid_text_view"
-                android:layout_toRightOf="@+id/my_jid_text_view"
-                android:src="@android:drawable/presence_offline"/>
-        </RelativeLayout>
-
-        <TextView
-            android:id="@+id/thing_jid_headline_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Thing JID"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center">
-
-            <TextView
-                android:id="@+id/otherJidTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:hint="Other JID not set"
-                android:textAppearance="?android:attr/textAppearanceMedium"/>
-
-            <ImageView
-                android:id="@+id/other_jid_presence_image_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toEndOf="@+id/otherJidTextView"
-                android:layout_toRightOf="@+id/otherJidTextView"
-                android:src="@android:drawable/presence_offline"/>
-        </RelativeLayout>
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="9dp"
-            />
+        android:layout_height="wrap_content"
+        android:layout_below="@id/setup_linear_layout">
 
         <LinearLayout
-            android:id="@+id/app_identity_linear_layout"
+            android:id="@+id/main_linear_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/data_section_headline_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="XEP-0323: Data"
-                android:textAppearance="?android:attr/textAppearanceLarge"/>
-
-            <View
+            <Space
                 android:layout_width="match_parent"
-                android:layout_height="5dp"
-                android:background="?android:attr/dividerHorizontal"
-                />
+                android:layout_height="12dp"/>
 
-            <RelativeLayout
-                android:id="@+id/data_gui_elements_relative_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <Button
-                    android:id="@+id/read_out_button"
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:enabled="false"
-                    android:minHeight="0dp"
-                    android:text="Read out"/>
-
-                <Switch
-                    android:id="@+id/continues_read_out_switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_toEndOf="@+id/read_out_button"
-                    android:enabled="false"
-                    android:gravity="right"
-                    android:text="Continuous"
-                    android:textAppearance="?android:attr/textAppearanceMedium"/>
-            </RelativeLayout>
-
-            <LinearLayout
-                android:id="@+id/iot_sensors_linear_layout"
+            <Switch
+                android:id="@+id/enableSwitch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="No data read-out so far."/>
-
-            </LinearLayout>
+                android:gravity="end"
+                android:onClick="enableSwitchToggled"
+                android:text="Enable"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
 
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="9dp"/>
 
             <TextView
-                android:id="@+id/control_section_headline_text_view"
+                android:id="@+id/my_jid_headline_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="XEP-0325: Control"
+                android:text="My JID"
                 android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-            <View
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="5dp"
-                android:background="?android:attr/dividerHorizontal"
-                />
-
-            <Switch
-                android:id="@+id/control_switch"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Notification Alarm"/>
+                android:gravity="center">
 
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/my_jid_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:hint="My JID not set"
+                    android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:id="@+id/thing_identity_linear_layout">
+                <ImageView
+                    android:id="@+id/my_jid_presence_image_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toEndOf="@+id/my_jid_text_view"
+                    android:layout_toRightOf="@+id/my_jid_text_view"
+                    android:src="@android:drawable/presence_offline"/>
+            </RelativeLayout>
 
             <TextView
-                android:id="@+id/thing_information_headline_text_view"
+                android:id="@+id/thing_jid_headline_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Thing Information"
+                android:text="Thing JID"
                 android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-            <View
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="5dp"
-                android:background="?android:attr/dividerHorizontal"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/otherJidTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:hint="Other JID not set"
+                    android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                <ImageView
+                    android:id="@+id/other_jid_presence_image_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toEndOf="@+id/otherJidTextView"
+                    android:layout_toRightOf="@+id/otherJidTextView"
+                    android:src="@android:drawable/presence_offline"/>
+            </RelativeLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="9dp"
                 />
 
             <LinearLayout
+                android:id="@+id/app_identity_linear_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:id="@+id/thing_information_infos_linear_layout">
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/data_section_headline_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="XEP-0323: Data"
+                    android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:background="?android:attr/dividerHorizontal"
+                    />
+
+                <RelativeLayout
+                    android:id="@+id/data_gui_elements_relative_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/read_out_button"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:enabled="false"
+                        android:minHeight="0dp"
+                        android:text="Read out"/>
+
+                    <Switch
+                        android:id="@+id/continues_read_out_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@+id/read_out_button"
+                        android:enabled="false"
+                        android:gravity="right"
+                        android:text="Continuous"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/iot_sensors_linear_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No data read-out so far."/>
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="9dp"/>
+
+                <TextView
+                    android:id="@+id/control_section_headline_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="XEP-0325: Control"
+                    android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:background="?android:attr/dividerHorizontal"
+                    />
+
+                <Switch
+                    android:id="@+id/control_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Notification Alarm"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/thing_identity_linear_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/thing_information_headline_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Thing Information"
+                    android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:background="?android:attr/dividerHorizontal"
+                    />
+
+                <LinearLayout
+                    android:id="@+id/thing_information_infos_linear_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                </LinearLayout>
 
             </LinearLayout>
 
         </LinearLayout>
-
-    </LinearLayout>
+    </ScrollView>
 
 </RelativeLayout>

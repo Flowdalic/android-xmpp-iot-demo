@@ -41,6 +41,7 @@ import org.jivesoftware.smackx.iot.data.IoTDataManager;
 import org.jivesoftware.smackx.iot.data.ThingMomentaryReadOutRequest;
 import org.jivesoftware.smackx.iot.data.ThingMomentaryReadOutResult;
 import org.jivesoftware.smackx.iot.data.element.IoTDataField;
+import org.jivesoftware.smackx.iot.discovery.element.Tag;
 import org.jxmpp.jid.Jid;
 
 import java.util.ArrayList;
@@ -257,7 +258,10 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 	void mainActivityOnCreate(MainActivity mainActivity) {
 		this.mMainActivity = mainActivity;
 
-
+		for (Tag tag : mThing.getMetaTags()) {
+			IotThingInfoView thingInfo = new IotThingInfoView(mainActivity, tag.getName(), tag.getValue());
+			mainActivity.mIotThingInfosLinearLayout.addView(thingInfo);
+		}
 	}
 
 	void mainActivityOnDestroy(MainActivity mainActivity) {

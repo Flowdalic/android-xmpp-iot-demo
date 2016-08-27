@@ -157,7 +157,7 @@ public class XmppManager implements RosterListener, ConnectionListener {
 
 		boolean connectionUsable = xmppConnection.isAuthenticated();
 		mainActivity.mReadOutButton.setEnabled(connectionUsable);
-		mainActivity.mContinousReadOutSwitch.setEnabled(connectionUsable);
+		mainActivity.mContiniousReadOutSwitch.setEnabled(connectionUsable);
 		maybeSetOtherJidPresenceGui();
 		maybeUpdateConnectionStateGui();
 	}
