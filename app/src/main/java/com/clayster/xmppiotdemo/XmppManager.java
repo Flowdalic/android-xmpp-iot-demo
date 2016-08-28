@@ -28,6 +28,7 @@ import org.asmack.core.AndroidSmackManager;
 import org.asmack.core.ManagedXmppConnection;
 import org.asmack.core.ManagedXmppConnectionListener;
 import org.asmack.core.XmppConnectionState;
+import org.jivesoftware.smack.AbstractConnectionListener;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
@@ -53,7 +54,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class XmppManager implements RosterListener, ConnectionListener {
+public class XmppManager implements RosterListener {
 
 	private static final Logger LOGGER = Logger.getLogger(XmppManager.class.getName());
 
@@ -82,6 +83,8 @@ public class XmppManager implements RosterListener, ConnectionListener {
 	private final Drawable mOfflineDrawable;
 	private final Drawable mConnectingDrawlable;
 
+	private ConnectionListener mConnectionListener;
+
 	private XmppManager(Context context) {
 		this.mContext = context.getApplicationContext();
 		this.settings = Settings.getInstance(mContext);
@@ -98,7 +101,7 @@ public class XmppManager implements RosterListener, ConnectionListener {
 
 		if (xmppConnection != null) {
 			xmppConnection.disconnect();
-			xmppConnection.removeConnectionListener(this);
+			xmppConnection.removeConnectionListener(mConnectionListener);
 			xmppConnection = null;
 
 			roster.removeRosterListener(this);
@@ -152,7 +155,45 @@ public class XmppManager implements RosterListener, ConnectionListener {
 		});
 		roster.addRosterListener(this);
 
-		xmppConnection.addConnectionListener(this);
+		mConnectionListener = new AbstractConnectionListener() {
+			@Override
+			public void connected(XMPPConnection connection) {
+				setConnectionState(XmppConnectionState.Connected);
+			}
+
+			@Override
+			public void authenticated(XMPPConnection connection, boolean resumed) {
+				maybeSetOtherJidPresenceGui();
+				RosterEntry otherJidEntry = roster.getEntry(settings.getOtherJid());
+
+				if (otherJidEntry == null || (!otherJidEntry.canSeeHisPresence() && !otherJidEntry.isSubscriptionPending())) {
+					try {
+						roster.sendSubscriptionRequest(settings.getOtherJid());
+					} catch (SmackException.NotLoggedInException | SmackException.NotConnectedException | InterruptedException e) {
+						LOGGER.log(Level.SEVERE, "Could not send subscription request to other JID", e);
+					}
+				}
+
+				connection.addAsyncStanzaListener(mMessageListener, MessageWithBodiesFilter.INSTANCE);
+
+				setConnectionState(XmppConnectionState.Authenticated);
+
+				for (XmppConnectionListener listener : mXmppConnectionStatusListeners) {
+					listener.authenticated(connection);
+				}
+			}
+
+			@Override
+			public void connectionClosed() {
+				connectionTerminated();
+			}
+
+			@Override
+			public void connectionClosedOnError(Exception e) {
+				connectionTerminated();
+			}
+		};
+		xmppConnection.addConnectionListener(mConnectionListener);
 	}
 
 	public void enable() {
@@ -212,47 +253,10 @@ public class XmppManager implements RosterListener, ConnectionListener {
 		maybeSetOtherJidPresenceGui();
 	}
 
-	@Override
-	public void connected(XMPPConnection connection) {
-		setConnectionState(XmppConnectionState.Connected);
-	}
-
 	private final StanzaListener mMessageListener = (stanza) -> {
 			Message message = (Message) stanza;
 			withMainActivity((ma) -> Toast.makeText(ma, "XIOT: " + message.getBody(), Toast.LENGTH_LONG).show());
 	};
-
-	@Override
-	public void authenticated(XMPPConnection connection, boolean resumed) {
-		maybeSetOtherJidPresenceGui();
-		RosterEntry otherJidEntry = roster.getEntry(settings.getOtherJid());
-
-		if (otherJidEntry == null || (!otherJidEntry.canSeeHisPresence() && !otherJidEntry.isSubscriptionPending())) {
-			try {
-				roster.sendSubscriptionRequest(settings.getOtherJid());
-			} catch (SmackException.NotLoggedInException | SmackException.NotConnectedException | InterruptedException e) {
-				LOGGER.log(Level.SEVERE, "Could not send subscription request to other JID", e);
-			}
-		}
-
-		connection.addAsyncStanzaListener(mMessageListener, MessageWithBodiesFilter.INSTANCE);
-
-		setConnectionState(XmppConnectionState.Authenticated);
-
-		for (XmppConnectionListener listener : mXmppConnectionStatusListeners) {
-			listener.authenticated(connection);
-		}
-	}
-
-	@Override
-	public void connectionClosed() {
-		connectionTerminated();
-	}
-
-	@Override
-	public void connectionClosedOnError(Exception e) {
-		connectionTerminated();
-	}
 
 	private void connectionTerminated() {
 		xmppConnection.removeAsyncStanzaListener(mMessageListener);
@@ -260,21 +264,6 @@ public class XmppManager implements RosterListener, ConnectionListener {
 		for (XmppConnectionListener listener : mXmppConnectionStatusListeners) {
 			listener.disconnected(xmppConnection);
 		}
-	}
-
-	@Override
-	public void reconnectionSuccessful() {
-
-	}
-
-	@Override
-	public void reconnectingIn(int seconds) {
-
-	}
-
-	@Override
-	public void reconnectionFailed(Exception e) {
-
 	}
 
 	private void maybeSetOtherJidPresenceGui() {
@@ -327,6 +316,7 @@ public class XmppManager implements RosterListener, ConnectionListener {
 
 	private void setConnectionState(XmppConnectionState state) {
 		mXmppConnectionState = state;
+		maybeUpdateConnectionStateGui();
 	}
 
 	private void maybeUpdateConnectionStateGui() {
