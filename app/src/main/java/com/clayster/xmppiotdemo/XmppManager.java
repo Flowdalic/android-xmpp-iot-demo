@@ -37,6 +37,7 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.MessageWithBodiesFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.roster.AbstractRosterListener;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smack.roster.RosterListener;
@@ -44,17 +45,15 @@ import org.jivesoftware.smack.roster.SubscribeListener;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jxmpp.jid.EntityFullJid;
-import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.parts.Resourcepart;
 import org.jxmpp.stringprep.XmppStringprepException;
 
-import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class XmppManager implements RosterListener {
+public class XmppManager {
 
 	private static final Logger LOGGER = Logger.getLogger(XmppManager.class.getName());
 
@@ -84,6 +83,7 @@ public class XmppManager implements RosterListener {
 	private final Drawable mConnectingDrawlable;
 
 	private ConnectionListener mConnectionListener;
+	private RosterListener mRosterListener;
 
 	private XmppManager(Context context) {
 		this.mContext = context.getApplicationContext();
@@ -104,7 +104,7 @@ public class XmppManager implements RosterListener {
 			xmppConnection.removeConnectionListener(mConnectionListener);
 			xmppConnection = null;
 
-			roster.removeRosterListener(this);
+			roster.removeRosterListener(mRosterListener);
 			roster = null;
 		}
 
@@ -153,7 +153,14 @@ public class XmppManager implements RosterListener {
 				return SubscribeListener.SubscribeAnswer.Deny;
 			}
 		});
-		roster.addRosterListener(this);
+		mRosterListener = new AbstractRosterListener() {
+			@Override
+			public void presenceChanged(Presence presence) {
+				if (!presence.getFrom().asBareJid().equals(settings.getOtherJid())) return;
+				maybeSetOtherJidPresenceGui();
+			}
+		};
+		roster.addRosterListener(mRosterListener);
 
 		mConnectionListener = new AbstractConnectionListener() {
 			@Override
@@ -230,27 +237,6 @@ public class XmppManager implements RosterListener {
 		synchronized (mainActivityLock) {
 			this.mainActivity = null;
 		}
-	}
-
-	@Override
-	public void entriesAdded(Collection<Jid> addresses) {
-
-	}
-
-	@Override
-	public void entriesUpdated(Collection<Jid> addresses) {
-
-	}
-
-	@Override
-	public void entriesDeleted(Collection<Jid> addresses) {
-
-	}
-
-	@Override
-	public void presenceChanged(Presence presence) {
-		if (!presence.getFrom().asBareJid().equals(settings.getOtherJid())) return;
-		maybeSetOtherJidPresenceGui();
 	}
 
 	private final StanzaListener mMessageListener = (stanza) -> {
