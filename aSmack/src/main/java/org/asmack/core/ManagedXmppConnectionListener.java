@@ -19,17 +19,12 @@
 
 package org.asmack.core;
 
-public class XmppConnectionStatus {
+public interface ManagedXmppConnectionListener {
 
-	private XmppConnectionState mState;
-	private String mOptionalInfo;
+	void connectionAttemptFailed(Exception e, ManagedXmppConnection connection);
 
-	void setStatus(XmppConnectionState state) {
-		setStatus(state, null);
-	}
+	void loginAttemptFailed(Exception e, ManagedXmppConnection connection);
 
-	void setStatus(XmppConnectionState state, String optionalInfo) {
-		mState = state;
-		mOptionalInfo = optionalInfo;
-	}
+	void stateChanged(XmppConnectionState oldState, XmppConnectionState newState, ManagedXmppConnection connection);
+
 }

@@ -19,9 +19,7 @@
 
 package org.asmack.core;
 
-import org.jivesoftware.smack.tcp.XMPPTCPConnection;
-
 public interface NewManagedConnectionListener {
 
-	void newConnection(XMPPTCPConnection connection);
+	void newConnection(ManagedXmppConnection connection);
 }

@@ -25,6 +25,8 @@ import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import org.asmack.core.AndroidSmackManager;
+import org.asmack.core.ManagedXmppConnection;
+import org.asmack.core.ManagedXmppConnectionListener;
 import org.asmack.core.XmppConnectionState;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
@@ -116,6 +118,25 @@ public class XmppManager implements RosterListener, ConnectionListener {
 		XMPPTCPConnectionConfiguration conf = builder.build();
 
 		xmppConnection = asmackManager.createManagedConnection(conf);
+		ManagedXmppConnection<XMPPTCPConnection> managedXmppConnection = asmackManager.getManagedXmppConnectionFor(xmppConnection);
+		managedXmppConnection.addListener(new ManagedXmppConnectionListener() {
+			@Override
+			public void connectionAttemptFailed(Exception e, ManagedXmppConnection connection) {
+				withMainActivity((ma) -> Toast.makeText(ma, "Connection failed: " + e, Toast.LENGTH_LONG).show());
+			}
+
+			@Override
+			public void loginAttemptFailed(Exception e, ManagedXmppConnection connection) {
+				withMainActivity((ma) -> Toast.makeText(ma, "Login failed: " + e, Toast.LENGTH_LONG).show());
+			}
+
+			@Override
+			public void stateChanged(XmppConnectionState oldState, XmppConnectionState newState, ManagedXmppConnection connection) {
+				withMainActivity((ma) -> Toast.makeText(ma,
+						"Connection state change from " + oldState + " to " + newState, Toast.LENGTH_LONG).show());
+			}
+		});
+
 
 		for (XmppConnectionListener listener : mXmppConnectionStatusListeners) {
 			listener.newConnection(xmppConnection);

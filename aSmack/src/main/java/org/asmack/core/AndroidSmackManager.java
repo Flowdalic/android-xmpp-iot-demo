@@ -24,6 +24,7 @@ import android.content.Intent;
 
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.sasl.SASLMechanism;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
@@ -34,6 +35,7 @@ import org.jivesoftware.smack.util.StringTransformer;
 
 import java.io.IOException;
 import java.text.Normalizer;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -82,7 +84,7 @@ public class AndroidSmackManager {
 
 	private final Context context;
 
-	private final Map<XMPPTCPConnection, XmppConnectionStatus> xmppTcpConnections = new WeakHashMap<>();
+	private final Map<XMPPTCPConnection, ManagedXmppConnection<XMPPTCPConnection>> mManagedConnections = new WeakHashMap<>();
 
 	private final Set<NewManagedConnectionListener> mNewConnectionListeners = new CopyOnWriteArraySet<>();
 
@@ -92,15 +94,23 @@ public class AndroidSmackManager {
 
 	public XMPPTCPConnection createManagedConnection(XMPPTCPConnectionConfiguration configuration) {
 		XMPPTCPConnection connection = new XMPPTCPConnection(configuration);
+		ManagedXmppConnection managedConnection = new ManagedXmppConnection(connection);
 
 		for (NewManagedConnectionListener newManagedConnectionListener : mNewConnectionListeners) {
-			newManagedConnectionListener.newConnection(connection);
+			newManagedConnectionListener.newConnection(managedConnection);
 		}
 
-		synchronized (xmppTcpConnections) {
-			xmppTcpConnections.put(connection, new XmppConnectionStatus());
+		synchronized (managedConnection) {
+			mManagedConnections.put(connection, managedConnection);
 		}
+
 		return connection;
+	}
+
+	public ManagedXmppConnection<XMPPTCPConnection> getManagedXmppConnectionFor(XMPPTCPConnection connection) {
+		synchronized (mManagedConnections) {
+			return mManagedConnections.get(connection);
+		}
 	}
 
 	public void addNewManagedConnectionListener(NewManagedConnectionListener newManagedConnectionListener) {
@@ -126,30 +136,67 @@ public class AndroidSmackManager {
 	}
 
 	void connectConnections() {
-		synchronized (xmppTcpConnections) {
-			for (XMPPTCPConnection connection : xmppTcpConnections.keySet()) {
+		forAllManagedConnections(new WithXmppConnection<XMPPTCPConnection>() {
+			@Override
+			public void withXmppConnection(XMPPTCPConnection connection, ManagedXmppConnection managedXmppConnection) {
 				try {
 					connection.connect();
 				} catch (SmackException | XMPPException | InterruptedException | IOException e) {
 					LOGGER.log(Level.WARNING, "connect() throw", e);
-					continue;
+
+					managedXmppConnection.getStatus().setStatus(XmppConnectionState.WaitingForRetry);
+
+					Iterator<ManagedXmppConnectionListener> it = managedXmppConnection.getListeners().iterator();
+					while (it.hasNext()) {
+						ManagedXmppConnectionListener listener = it.next();
+						listener.connectionAttemptFailed(e, managedXmppConnection);
+					}
+
+					return;
 				}
 
 				try {
 					connection.login();
 				} catch (SmackException | XMPPException | InterruptedException | IOException e) {
 					LOGGER.log(Level.WARNING, "login() throw", e);
+
+					managedXmppConnection.getStatus().setStatus(XmppConnectionState.WaitingForRetry);
+
+					Iterator<ManagedXmppConnectionListener> it = managedXmppConnection.getListeners().iterator();
+					while (it.hasNext()) {
+						ManagedXmppConnectionListener listener = it.next();
+						listener.loginAttemptFailed(e, managedXmppConnection);
+					}
+
+					return;
+				}
+			}
+		});
+	}
+
+	void disconnectConnections() {
+		forAllManagedConnections(new WithXmppConnection<XMPPTCPConnection>() {
+			@Override
+			public void withXmppConnection(XMPPTCPConnection connection, ManagedXmppConnection managedXmppConnection) {
+				connection.disconnect();
+			}
+		});
+	}
+
+	void forAllManagedConnections(WithXmppConnection<XMPPTCPConnection> withXmppConnection) {
+		synchronized (mManagedConnections) {
+			for (ManagedXmppConnection<XMPPTCPConnection> managedXmppConnection : mManagedConnections.values()) {
+				final XMPPTCPConnection connection = managedXmppConnection.getConnection();
+				if (connection == null) {
+					mManagedConnections.remove(managedXmppConnection);
 					continue;
 				}
+				withXmppConnection.withXmppConnection(connection, managedXmppConnection);
 			}
 		}
 	}
 
-	void disconnectConnections() {
-		synchronized (xmppTcpConnections) {
-			for (XMPPTCPConnection connection : xmppTcpConnections.keySet()) {
-				connection.disconnect();
-			}
-		}
+	interface WithXmppConnection<C extends XMPPConnection> {
+		void withXmppConnection(C connection, ManagedXmppConnection<C> managedConnection);
 	}
 }
