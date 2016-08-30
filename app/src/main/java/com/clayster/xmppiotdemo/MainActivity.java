@@ -182,6 +182,8 @@ public class MainActivity extends AppCompatActivity {
 
 		int appIdentityVisibility = mSettings.isIdentityModeApp() ? View.VISIBLE : View.GONE;
 		mAppIdentityLinearLayout.setVisibility(appIdentityVisibility);
+		// We want the thing JID visible if the identity is 'app'.
+		mThingJidLinearLayout.setVisibility(appIdentityVisibility);
 
 		int thingIdentityVisibility = mSettings.isIdentityModeThing() ? View.VISIBLE : View.GONE;
 		mThingIdentityLinearLayout.setVisibility(thingIdentityVisibility);
