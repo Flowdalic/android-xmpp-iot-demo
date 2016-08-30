@@ -89,8 +89,8 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:maxWidth="200sp"
                     android:hint="My JID not set"
+                    android:maxWidth="200sp"
                     android:textAppearance="?android:attr/textAppearanceMedium"/>
 
                 <ImageView
@@ -102,36 +102,44 @@
                     android:src="@android:drawable/presence_offline"/>
             </RelativeLayout>
 
-            <TextView
-                android:id="@+id/thing_jid_headline_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Thing JID"
-                android:textAppearance="?android:attr/textAppearanceLarge"/>
-
-            <RelativeLayout
+            <LinearLayout
+                android:id="@+id/thing_jid_linear_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center">
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/otherJidTextView"
+                    android:id="@+id/thing_jid_headline_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:maxWidth="200sp"
-                    android:hint="Other JID not set"
-                    android:textAppearance="?android:attr/textAppearanceMedium"/>
+                    android:text="Thing JID"
+                    android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-                <ImageView
-                    android:id="@+id/other_jid_presence_image_view"
-                    android:layout_width="wrap_content"
+                <RelativeLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toEndOf="@+id/otherJidTextView"
-                    android:src="@android:drawable/presence_offline"/>
-            </RelativeLayout>
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/otherJidTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:hint="Other JID not set"
+                        android:maxWidth="200sp"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                    <ImageView
+                        android:id="@+id/other_jid_presence_image_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@+id/otherJidTextView"
+                        android:src="@android:drawable/presence_offline"/>
+                </RelativeLayout>
+
+            </LinearLayout>
 
             <Space
                 android:layout_width="match_parent"
@@ -139,7 +147,7 @@
                 />
 
             <LinearLayout
-                android:id="@+id/app_identity_linear_layout"
+                android:id="@+id/iot_claiming_linear_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -162,8 +170,8 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_alignParentTop="true"
-                        android:maxWidth="200sp"
                         android:hint="No thing claimed"
+                        android:maxWidth="200sp"
                         android:textAppearance="?android:attr/textAppearanceMedium"/>
 
                     <ImageView
@@ -180,9 +188,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:onClick="claimThingButtonClicked"
                     android:enabled="false"
+                    android:onClick="claimThingButtonClicked"
                     android:text="Claim Thing"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/app_identity_linear_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
 
                 <TextView
                     android:id="@+id/data_section_headline_text_view"

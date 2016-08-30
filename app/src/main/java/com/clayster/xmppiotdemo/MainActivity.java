@@ -57,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
 	 */
 	private LinearLayout mThingIdentityLinearLayout;
 
+	private LinearLayout mThingJidLinearLayout;
+	private LinearLayout mIotClaimedLinearLayout;
+
 	LinearLayout mIotSensorsLinearLayout;
 	LinearLayout mIotThingInfosLinearLayout;
 
@@ -83,6 +86,9 @@ public class MainActivity extends AppCompatActivity {
 
 		mThingIdentityLinearLayout = (LinearLayout) findViewById(R.id.thing_identity_linear_layout);
 		mAppIdentityLinearLayout = (LinearLayout) findViewById(R.id.app_identity_linear_layout);
+
+		mThingJidLinearLayout = (LinearLayout) findViewById(R.id.thing_jid_linear_layout);
+		mIotClaimedLinearLayout = (LinearLayout) findViewById(R.id.iot_claiming_linear_layout);
 
 		mSetupLinearLayout = (LinearLayout) findViewById(R.id.setup_linear_layout);
 		mMainLinearLayout = (LinearLayout) findViewById(R.id.main_linear_layout);
@@ -143,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		MenuItem claimThingOption = menu.findItem(R.id.action_claim_thing);
 		// Only show the claim thing menu option if the identity mode is 'app'.
-		claimThingOption.setEnabled(mSettings.isIdentityModeApp());
+		claimThingOption.setEnabled(mSettings.showClaimGuiElements());
 		return true;
 	}
 
@@ -188,11 +194,16 @@ public class MainActivity extends AppCompatActivity {
 			mMyJidTextView.setText(mSettings.getMyJid());
 		}
 
-		if (mSettings.getClaimedJid() != null) {
-			mClaimThingButton.setVisibility(View.GONE);
-			mClaimedJidTextView.setText(mSettings.getClaimedJid());
+		if (mSettings.showClaimGuiElements()) {
+			mIotClaimedLinearLayout.setVisibility(View.VISIBLE);
+			if (mSettings.getClaimedJid() != null) {
+				mClaimThingButton.setVisibility(View.GONE);
+				mClaimedJidTextView.setText(mSettings.getClaimedJid());
+			} else {
+				mClaimThingButton.setVisibility(View.VISIBLE);
+			}
 		} else {
-			mClaimThingButton.setVisibility(View.VISIBLE);
+			mIotClaimedLinearLayout.setVisibility(View.GONE);
 		}
 	}
 

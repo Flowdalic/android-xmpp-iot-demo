@@ -218,4 +218,8 @@ public class Settings {
 		}
 		return sn;
 	}
+
+	public boolean showClaimGuiElements() {
+		return false;
+	}
 }
