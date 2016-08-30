@@ -21,8 +21,12 @@ package org.asmack.core;
 
 public class XmppConnectionStatus {
 
-	private XmppConnectionState mState;
+	private XmppConnectionState mState = XmppConnectionState.Disconnected;
 	private String mOptionalInfo;
+
+	public XmppConnectionState getState() {
+		return mState;
+	}
 
 	void setStatus(XmppConnectionState state) {
 		setStatus(state, null);

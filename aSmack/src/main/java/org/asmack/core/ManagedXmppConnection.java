@@ -39,6 +39,7 @@ public class ManagedXmppConnection<C extends XMPPConnection> {
 		mConnectionListener = new ConnectionListener() {
 			@Override
 			public void connected(XMPPConnection connection) {
+				mStatus.setStatus(XmppConnectionState.Connected);
 				for (ManagedXmppConnectionListener listener : mListeners) {
 					listener.connected(connection);
 				}
@@ -46,6 +47,7 @@ public class ManagedXmppConnection<C extends XMPPConnection> {
 
 			@Override
 			public void authenticated(XMPPConnection connection, boolean resumed) {
+				mStatus.setStatus(XmppConnectionState.Authenticated);
 				for (ManagedXmppConnectionListener listener : mListeners) {
 					listener.authenticated(connection, resumed);
 				}
@@ -53,6 +55,7 @@ public class ManagedXmppConnection<C extends XMPPConnection> {
 
 			@Override
 			public void connectionClosed() {
+				mStatus.setStatus(XmppConnectionState.Disconnected);
 				for (ManagedXmppConnectionListener listener : mListeners) {
 					listener.connectionClosed();
 					listener.terminated();
@@ -61,6 +64,7 @@ public class ManagedXmppConnection<C extends XMPPConnection> {
 
 			@Override
 			public void connectionClosedOnError(Exception e) {
+				mStatus.setStatus(XmppConnectionState.Disconnected);
 				for (ManagedXmppConnectionListener listener : mListeners) {
 					listener.connectionClosedOnError(e);
 					listener.terminated();
@@ -107,7 +111,11 @@ public class ManagedXmppConnection<C extends XMPPConnection> {
 		return mListeners;
 	}
 
-	XmppConnectionStatus getStatus() {
+	public XmppConnectionStatus getStatus() {
 		return mStatus;
+	}
+
+	public XmppConnectionState getState() {
+		return getStatus().getState();
 	}
 }

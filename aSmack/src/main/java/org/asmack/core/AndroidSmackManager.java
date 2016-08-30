@@ -144,8 +144,6 @@ public class AndroidSmackManager {
 				} catch (SmackException | XMPPException | InterruptedException | IOException e) {
 					LOGGER.log(Level.WARNING, "connect() throw", e);
 
-					managedXmppConnection.getStatus().setStatus(XmppConnectionState.WaitingForRetry);
-
 					Iterator<ManagedXmppConnectionListener> it = managedXmppConnection.getListeners().iterator();
 					while (it.hasNext()) {
 						ManagedXmppConnectionListener listener = it.next();
@@ -159,8 +157,6 @@ public class AndroidSmackManager {
 					connection.login();
 				} catch (SmackException | XMPPException | InterruptedException | IOException e) {
 					LOGGER.log(Level.WARNING, "login() throw", e);
-
-					managedXmppConnection.getStatus().setStatus(XmppConnectionState.WaitingForRetry);
 
 					Iterator<ManagedXmppConnectionListener> it = managedXmppConnection.getListeners().iterator();
 					while (it.hasNext()) {

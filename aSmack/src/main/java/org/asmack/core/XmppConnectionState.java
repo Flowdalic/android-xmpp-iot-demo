@@ -25,7 +25,4 @@ public enum XmppConnectionState {
 	Authenticated,
 	Disconnecting,
 	Disconnected,
-	InstantDisconnected,
-	WaitingForNetwork,
-	WaitingForRetry,
 }

@@ -68,9 +68,8 @@ public class XmppManager {
 	private final Settings settings;
 	private final AndroidSmackManager asmackManager;
 
-	private XMPPTCPConnectionConfiguration.Builder usedBuilder;
+	private ManagedXmppConnection<XMPPTCPConnection> mManagedXmppConnection;
 	private XMPPTCPConnection xmppConnection;
-	private volatile XmppConnectionState mXmppConnectionState = XmppConnectionState.Disconnected;
 	private Roster roster;
 
 	private final Object mainActivityLock = new Object();
@@ -121,11 +120,11 @@ public class XmppManager {
 		// Disable SM (for now).
 		xmppConnection.setUseStreamManagement(false);
 
-		ManagedXmppConnection<XMPPTCPConnection> managedXmppConnection = asmackManager.getManagedXmppConnectionFor(xmppConnection);
-		managedXmppConnection.addListener(new AbstractManagedXmppConnectionListener() {
+		mManagedXmppConnection = asmackManager.getManagedXmppConnectionFor(xmppConnection);
+		mManagedXmppConnection.addListener(new AbstractManagedXmppConnectionListener() {
 			@Override
 			public void connected(XMPPConnection connection) {
-				setConnectionState(XmppConnectionState.Connected);
+				maybeUpdateConnectionStateGui();
 			}
 
 			@Override
@@ -143,13 +142,13 @@ public class XmppManager {
 
 				connection.addAsyncStanzaListener(mMessageListener, MessageWithBodiesFilter.INSTANCE);
 
-				setConnectionState(XmppConnectionState.Authenticated);
+				maybeUpdateConnectionStateGui();
 			}
 
 			@Override
 			public void terminated() {
 				xmppConnection.removeAsyncStanzaListener(mMessageListener);
-				setConnectionState(XmppConnectionState.Disconnected);
+				maybeUpdateConnectionStateGui();
 			}
 
 			@Override
@@ -271,14 +270,9 @@ public class XmppManager {
 		void newConnection(ManagedXmppConnection<XMPPTCPConnection> connection);
 	}
 
-	private void setConnectionState(XmppConnectionState state) {
-		mXmppConnectionState = state;
-		maybeUpdateConnectionStateGui();
-	}
-
 	private void maybeUpdateConnectionStateGui() {
 		final Drawable drawable;
-		switch (mXmppConnectionState) {
+		switch (getConnectionState()) {
 			case Connecting:
 			case Connected:
 				drawable = mConnectingDrawlable;
@@ -296,6 +290,8 @@ public class XmppManager {
 	}
 
 	XmppConnectionState getConnectionState() {
-		return mXmppConnectionState;
+		final ManagedXmppConnection<XMPPTCPConnection> managedXmppConnection = mManagedXmppConnection;
+		if (managedXmppConnection == null) return XmppConnectionState.Disconnected;
+		return managedXmppConnection.getState();
 	}
 }
