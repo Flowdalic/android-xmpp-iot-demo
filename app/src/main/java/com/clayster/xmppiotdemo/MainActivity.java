@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
 		mMyJidTextView = (TextView) findViewById(R.id.my_jid_text_view);
 		mOtherJidTextView = (TextView) findViewById(R.id.otherJidTextView);
-		mClaimedJidTextView = (TextView) findViewById(R.id.claim_thing_text_view);
+		mClaimedJidTextView = (TextView) findViewById(R.id.claim_thing_activity_button);
 
 		myJidPresenceImageView = (ImageView) findViewById(R.id.my_jid_presence_image_view);
 		otherJidPresenceImageView = (ImageView) findViewById(R.id.other_jid_presence_image_view);

@@ -127,26 +127,31 @@ public class ClaimThingActivity extends AppCompatActivity {
 	public void claimButtonClicked(View view) {
 		final String sn = mSnTextView.getText().toString();
 		if (StringUtils.isNullOrEmpty(sn)) {
+			showInGui("SN not set");
 			return;
 		}
 
 		final String man = mManTextView.getText().toString();
 		if (StringUtils.isNullOrEmpty(man)) {
+			showInGui("MAN not set");
 			return;
 		}
 
 		final String model = mModelTextView.getText().toString();
 		if (StringUtils.isNullOrEmpty(model)) {
+			showInGui("MODEL not set");
 			return;
 		}
 
 		final String v = mVTextView.getText().toString();
 		if (StringUtils.isNullOrEmpty(v)) {
+			showInGui("V not set");
 			return;
 		}
 
 		final String key = mKeyTextView.getText().toString();
 		if (StringUtils.isNullOrEmpty(key)) {
+			showInGui("KEY not set");
 			return;
 		}
 
@@ -165,10 +170,12 @@ public class ClaimThingActivity extends AppCompatActivity {
 
 		final XMPPTCPConnection connection = mXmppManger.getXmppConnection();
 		if (connection == null) {
+			showInGui("Not connection available");
 			return;
 		}
 
-		if (connection.isAuthenticated()) {
+		if (!connection.isAuthenticated()) {
+			showInGui("Connection not authenticated");
 			return;
 		}
 
@@ -178,6 +185,8 @@ public class ClaimThingActivity extends AppCompatActivity {
 		try {
 			iotClaimed = ioTDiscoveryManager.claimThing(mRegistry, thing.getMetaTags(), true);
 		} catch (SmackException.NoResponseException | XMPPException.XMPPErrorException | SmackException.NotConnectedException | InterruptedException e) {
+			showInGui("Could not claim because " + e);
+			LOGGER.log(Level.WARNING, "Could not register", e);
 			return;
 		}
 
