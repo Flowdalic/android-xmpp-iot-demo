@@ -24,13 +24,11 @@ import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
+import org.asmack.core.AbstractManagedXmppConnectionListener;
 import org.asmack.core.AndroidSmackManager;
 import org.asmack.core.ManagedXmppConnection;
-import org.asmack.core.ManagedXmppConnectionListener;
 import org.asmack.core.XmppConnectionState;
-import org.jivesoftware.smack.AbstractConnectionListener;
 import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
@@ -82,7 +80,6 @@ public class XmppManager {
 	private final Drawable mOfflineDrawable;
 	private final Drawable mConnectingDrawlable;
 
-	private ConnectionListener mConnectionListener;
 	private RosterListener mRosterListener;
 
 	private XmppManager(Context context) {
@@ -101,7 +98,6 @@ public class XmppManager {
 
 		if (xmppConnection != null) {
 			xmppConnection.disconnect();
-			xmppConnection.removeConnectionListener(mConnectionListener);
 			xmppConnection = null;
 
 			roster.removeRosterListener(mRosterListener);
@@ -122,7 +118,44 @@ public class XmppManager {
 
 		xmppConnection = asmackManager.createManagedConnection(conf);
 		ManagedXmppConnection<XMPPTCPConnection> managedXmppConnection = asmackManager.getManagedXmppConnectionFor(xmppConnection);
-		managedXmppConnection.addListener(new ManagedXmppConnectionListener() {
+		managedXmppConnection.addListener(new AbstractManagedXmppConnectionListener() {
+			@Override
+			public void connected(XMPPConnection connection) {
+				setConnectionState(XmppConnectionState.Connected);
+			}
+
+			@Override
+			public void authenticated(XMPPConnection connection, boolean resumed) {
+				maybeSetOtherJidPresenceGui();
+				RosterEntry otherJidEntry = roster.getEntry(settings.getOtherJid());
+
+				if (otherJidEntry == null || (!otherJidEntry.canSeeHisPresence() && !otherJidEntry.isSubscriptionPending())) {
+					try {
+						roster.sendSubscriptionRequest(settings.getOtherJid());
+					} catch (SmackException.NotLoggedInException | SmackException.NotConnectedException | InterruptedException e) {
+						LOGGER.log(Level.SEVERE, "Could not send subscription request to other JID", e);
+					}
+				}
+
+				connection.addAsyncStanzaListener(mMessageListener, MessageWithBodiesFilter.INSTANCE);
+
+				setConnectionState(XmppConnectionState.Authenticated);
+
+				for (XmppConnectionListener listener : mXmppConnectionStatusListeners) {
+					listener.authenticated(connection);
+				}
+			}
+
+			@Override
+			public void connectionClosed() {
+				connectionTerminated();
+			}
+
+			@Override
+			public void connectionClosedOnError(Exception e) {
+				connectionTerminated();
+			}
+
 			@Override
 			public void connectionAttemptFailed(Exception e, ManagedXmppConnection connection) {
 				withMainActivity((ma) -> Toast.makeText(ma, "Connection failed: " + e, Toast.LENGTH_LONG).show());
@@ -161,46 +194,6 @@ public class XmppManager {
 			}
 		};
 		roster.addRosterListener(mRosterListener);
-
-		mConnectionListener = new AbstractConnectionListener() {
-			@Override
-			public void connected(XMPPConnection connection) {
-				setConnectionState(XmppConnectionState.Connected);
-			}
-
-			@Override
-			public void authenticated(XMPPConnection connection, boolean resumed) {
-				maybeSetOtherJidPresenceGui();
-				RosterEntry otherJidEntry = roster.getEntry(settings.getOtherJid());
-
-				if (otherJidEntry == null || (!otherJidEntry.canSeeHisPresence() && !otherJidEntry.isSubscriptionPending())) {
-					try {
-						roster.sendSubscriptionRequest(settings.getOtherJid());
-					} catch (SmackException.NotLoggedInException | SmackException.NotConnectedException | InterruptedException e) {
-						LOGGER.log(Level.SEVERE, "Could not send subscription request to other JID", e);
-					}
-				}
-
-				connection.addAsyncStanzaListener(mMessageListener, MessageWithBodiesFilter.INSTANCE);
-
-				setConnectionState(XmppConnectionState.Authenticated);
-
-				for (XmppConnectionListener listener : mXmppConnectionStatusListeners) {
-					listener.authenticated(connection);
-				}
-			}
-
-			@Override
-			public void connectionClosed() {
-				connectionTerminated();
-			}
-
-			@Override
-			public void connectionClosedOnError(Exception e) {
-				connectionTerminated();
-			}
-		};
-		xmppConnection.addConnectionListener(mConnectionListener);
 	}
 
 	public void enable() {

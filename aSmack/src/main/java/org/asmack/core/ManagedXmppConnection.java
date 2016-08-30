@@ -19,6 +19,7 @@
 
 package org.asmack.core;
 
+import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.XMPPConnection;
 
 import java.lang.ref.WeakReference;
@@ -29,10 +30,63 @@ public class ManagedXmppConnection<C extends XMPPConnection> {
 
 	private final WeakReference<C> mConnection;
 	private final XmppConnectionStatus mStatus = new XmppConnectionStatus();
-	private final Set<ManagedXmppConnectionListener> listeners = new CopyOnWriteArraySet<>();
+	private final Set<ManagedXmppConnectionListener> mListeners = new CopyOnWriteArraySet<>();
+	private final ConnectionListener mConnectionListener;
 
 	ManagedXmppConnection(C connection) {
 		mConnection = new WeakReference<>(connection);
+
+		mConnectionListener = new ConnectionListener() {
+			@Override
+			public void connected(XMPPConnection connection) {
+				for (ManagedXmppConnectionListener listener : mListeners) {
+					listener.connected(connection);
+				}
+			}
+
+			@Override
+			public void authenticated(XMPPConnection connection, boolean resumed) {
+				for (ManagedXmppConnectionListener listener : mListeners) {
+					listener.authenticated(connection, resumed);
+				}
+			}
+
+			@Override
+			public void connectionClosed() {
+				for (ManagedXmppConnectionListener listener : mListeners) {
+					listener.connectionClosed();
+				}
+			}
+
+			@Override
+			public void connectionClosedOnError(Exception e) {
+				for (ManagedXmppConnectionListener listener : mListeners) {
+					listener.connectionClosedOnError(e);
+				}
+			}
+
+			@Override
+			public void reconnectionSuccessful() {
+				for (ManagedXmppConnectionListener listener : mListeners) {
+					listener.reconnectionSuccessful();
+				}
+			}
+
+			@Override
+			public void reconnectingIn(int seconds) {
+				for (ManagedXmppConnectionListener listener : mListeners) {
+					listener.reconnectingIn(seconds);
+				}
+			}
+
+			@Override
+			public void reconnectionFailed(Exception e) {
+				for (ManagedXmppConnectionListener listener : mListeners) {
+					listener.reconnectionFailed(e);
+				}
+			}
+		};
+		connection.addConnectionListener(mConnectionListener);
 	}
 
 	public C getConnection() {
@@ -40,15 +94,15 @@ public class ManagedXmppConnection<C extends XMPPConnection> {
 	}
 
 	public void addListener(ManagedXmppConnectionListener listener) {
-		listeners.add(listener);
+		mListeners.add(listener);
 	}
 
 	public boolean removeListener(ManagedXmppConnectionListener listener) {
-		return listeners.remove(listener);
+		return mListeners.remove(listener);
 	}
 
 	Set<ManagedXmppConnectionListener> getListeners() {
-		return listeners;
+		return mListeners;
 	}
 
 	XmppConnectionStatus getStatus() {

@@ -19,14 +19,23 @@
 
 package org.asmack.core;
 
-import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.AbstractConnectionListener;
 
-public interface ManagedXmppConnectionListener extends ConnectionListener {
+public abstract class AbstractManagedXmppConnectionListener extends AbstractConnectionListener implements ManagedXmppConnectionListener {
 
-	void connectionAttemptFailed(Exception e, ManagedXmppConnection connection);
+	@Override
+	public void connectionAttemptFailed(Exception e, ManagedXmppConnection connection) {
 
-	void loginAttemptFailed(Exception e, ManagedXmppConnection connection);
+	}
 
-	void stateChanged(XmppConnectionState oldState, XmppConnectionState newState, ManagedXmppConnection connection);
+	@Override
+	public void loginAttemptFailed(Exception e, ManagedXmppConnection connection) {
+
+	}
+
+	@Override
+	public void stateChanged(XmppConnectionState oldState, XmppConnectionState newState, ManagedXmppConnection connection) {
+
+	}
 
 }
