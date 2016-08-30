@@ -108,13 +108,12 @@ public class MainActivity extends AppCompatActivity {
 		mSettings = Settings.getInstance(this);
 
 		mXmppIotThing = XmppIotThing.getInstance(this);
-		mXmppIotThing.mainActivityOnCreate(this);
-
 		xmppManager = XmppManager.getInstance(this);
-		xmppManager.mainActivityOnCreate(this);
-
 		mXmppIotDataControl = XmppIotDataControl.getInstance(this);
+
+		mXmppIotThing.mainActivityOnCreate(this);
 		mXmppIotDataControl.mainActivityOnCreate(this);
+		xmppManager.mainActivityOnCreate(this);
 	}
 
 	public void configureButtonClicked(View view) {
