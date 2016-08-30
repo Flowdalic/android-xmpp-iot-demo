@@ -83,7 +83,7 @@ public class XmppIotDataControl {
 		ma.mReadOutButton.setEnabled(enabled);
 		ma.mContiniousReadOutSwitch.setEnabled(enabled);
 		ma.mControlSwitch.setEnabled(enabled);
-		ma.mClaimThingButton.setEnabled(enabled);
+		ma.mClaimThingActivityButton.setEnabled(enabled);
 	}
 
 	void mainActivityOnCreate(MainActivity mainActivity) {

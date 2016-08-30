@@ -34,6 +34,8 @@ import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import org.jxmpp.jid.EntityBareJid;
+
 public class MainActivity extends AppCompatActivity {
 
 	private Settings mSettings;
@@ -73,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
 	ImageView myJidPresenceImageView;
 	ImageView otherJidPresenceImageView;
-	Button mClaimThingButton;
+	Button mClaimThingActivityButton;
 	Button mReadOutButton;
 	Switch mContiniousReadOutSwitch;
 
@@ -118,11 +120,11 @@ public class MainActivity extends AppCompatActivity {
 
 		mMyJidTextView = (TextView) findViewById(R.id.my_jid_text_view);
 		mOtherJidTextView = (TextView) findViewById(R.id.otherJidTextView);
-		mClaimedJidTextView = (TextView) findViewById(R.id.claim_thing_activity_button);
+		mClaimedJidTextView = (TextView) findViewById(R.id.claimed_jid_text_view);
 
 		myJidPresenceImageView = (ImageView) findViewById(R.id.my_jid_presence_image_view);
 		otherJidPresenceImageView = (ImageView) findViewById(R.id.other_jid_presence_image_view);
-		mClaimThingButton = (Button) findViewById(R.id.claim_thing_activity_button);
+		mClaimThingActivityButton = (Button) findViewById(R.id.claim_thing_activity_button);
 		mReadOutButton = (Button) findViewById(R.id.read_out_button);
 		mContiniousReadOutSwitch = (Switch) findViewById(R.id.continues_read_out_switch);
 		mControlSwitch = (Switch) findViewById(R.id.control_switch);
@@ -218,13 +220,14 @@ public class MainActivity extends AppCompatActivity {
 		}
 
 		if (mSettings.showClaimGuiElements()) {
-			mIotClaimedLinearLayout.setVisibility(View.VISIBLE);
-			if (mSettings.getClaimedJid() != null) {
-				mClaimThingButton.setVisibility(View.GONE);
-				mClaimedJidTextView.setText(mSettings.getClaimedJid());
+			EntityBareJid claimedJid = mSettings.getClaimedJid();
+			if (claimedJid != null) {
+				mClaimThingActivityButton.setVisibility(View.GONE);
+				mClaimedJidTextView.setText(claimedJid);
 			} else {
-				mClaimThingButton.setVisibility(View.VISIBLE);
+				mClaimThingActivityButton.setVisibility(View.VISIBLE);
 			}
+			mIotClaimedLinearLayout.setVisibility(View.VISIBLE);
 		} else {
 			mIotClaimedLinearLayout.setVisibility(View.GONE);
 		}
