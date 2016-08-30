@@ -59,6 +59,7 @@ public class Settings {
 	private static final String IDENTIY_MODE_KEY = "pref_identityMode";
 
 	private static final String THING_SN_KEY = "pref_thingSn";
+	private static final String REQUIRES_FIRST_TIME_SETUP_KEY = "pref_requireFirstTimeSetup";
 
 	private final SharedPreferences preferences;
 	private final MemorizingTrustManager mMemorizingTrustManager;
@@ -176,6 +177,13 @@ public class Settings {
 		both,
 	}
 
+	void firstTimeSetup(IdentityMode identityMode) {
+		preferences.edit()
+				.putString(IDENTIY_MODE_KEY, identityMode.toString())
+				.putBoolean(REQUIRES_FIRST_TIME_SETUP_KEY, false)
+				.apply();
+	}
+
 	public IdentityMode getIdentityMode() {
 		String identityMode = preferences.getString(IDENTIY_MODE_KEY, "both");
 		switch (identityMode) {
@@ -221,5 +229,9 @@ public class Settings {
 
 	public boolean showClaimGuiElements() {
 		return false;
+	}
+
+	public boolean firstTimeSetupRequired() {
+		return preferences.getBoolean(REQUIRES_FIRST_TIME_SETUP_KEY, true);
 	}
 }

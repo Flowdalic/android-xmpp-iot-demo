@@ -22,6 +22,7 @@ package com.clayster.xmppiotdemo;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -84,6 +85,28 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		mSettings = Settings.getInstance(this);
+
+		if (mSettings.firstTimeSetupRequired()) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle("Please choose App identity")
+					.setMessage("This App can bei either operated as IoT data/control 'App', as IoT 'Thing' or as 'Both'. Please choose one. The selection can be later changed in the App's settings.")
+					.setNegativeButton("App", (d, i) -> {
+						mSettings.firstTimeSetup(Settings.IdentityMode.app);
+						reload();
+					})
+					.setNeutralButton("Both", (d, i) -> {
+						mSettings.firstTimeSetup(Settings.IdentityMode.both);
+						reload();
+					})
+					.setPositiveButton("Thing", (d, i) -> {
+						mSettings.firstTimeSetup(Settings.IdentityMode.thing);
+						reload();
+					})
+					.create()
+					.show();
+		}
+
 		mThingIdentityLinearLayout = (LinearLayout) findViewById(R.id.thing_identity_linear_layout);
 		mAppIdentityLinearLayout = (LinearLayout) findViewById(R.id.app_identity_linear_layout);
 
@@ -110,8 +133,6 @@ public class MainActivity extends AppCompatActivity {
 		setSupportActionBar(mainToolbar);
 
 		PreferenceManager.setDefaultValues(this, R.xml.xiot_preferences, false);
-
-		mSettings = Settings.getInstance(this);
 
 		mXmppIotThing = XmppIotThing.getInstance(this);
 		xmppManager = XmppManager.getInstance(this);
@@ -215,5 +236,11 @@ public class MainActivity extends AppCompatActivity {
 		xmppManager.mainActivityOnDestroy(this);
 		mXmppIotDataControl.mainActivityOnDestroy(this);
 		mXmppIotThing.mainActivityOnDestroy(this);
+	}
+
+	private void reload() {
+		Intent intent = getIntent();
+		finish();
+		startActivity(intent);
 	}
 }
