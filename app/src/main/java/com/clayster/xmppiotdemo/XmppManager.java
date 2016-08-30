@@ -121,6 +121,11 @@ public class XmppManager {
 		xmppConnection.setUseStreamManagement(false);
 
 		mManagedXmppConnection = asmackManager.getManagedXmppConnectionFor(xmppConnection);
+
+		for (XmppConnectionListener listener : mXmppConnectionStatusListeners) {
+			listener.newConnection(mManagedXmppConnection);
+		}
+
 		mManagedXmppConnection.addListener(new AbstractManagedXmppConnectionListener() {
 			@Override
 			public void connected(XMPPConnection connection) {

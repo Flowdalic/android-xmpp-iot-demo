@@ -29,6 +29,9 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.BatteryManager;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import org.asmack.core.AbstractManagedXmppConnectionListener;
 import org.jivesoftware.smack.SmackException;
@@ -47,7 +50,9 @@ import org.jivesoftware.smackx.iot.data.element.IoTDataField;
 import org.jivesoftware.smackx.iot.discovery.IoTClaimedException;
 import org.jivesoftware.smackx.iot.discovery.IoTDiscoveryManager;
 import org.jivesoftware.smackx.iot.discovery.ThingState;
+import org.jivesoftware.smackx.iot.discovery.ThingStateChangeListener;
 import org.jivesoftware.smackx.iot.discovery.element.Tag;
+import org.jxmpp.jid.BareJid;
 import org.jxmpp.jid.Jid;
 
 import java.util.ArrayList;
@@ -123,7 +128,7 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 			LOGGER.info("No gravity sensor found");
 		}
 
-		XmppManager.getInstance(mContext).addXmppConnectionStatusListener((ma) -> {
+	 	XmppManager.getInstance(mContext).addXmppConnectionStatusListener((ma) -> {
 			XMPPTCPConnection connection = ma.getConnection();
 			IoTDataManager iotDataManager = IoTDataManager.getInstanceFor(connection);
 			iotDataManager.installThing(mThing);
@@ -291,7 +296,7 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 		mThingState = null;
 		final int MAX_ATTEMPTS = 3;
 		int attempts = 0;
-		while (mThingState != null && attempts < MAX_ATTEMPTS) {
+		while (mThingState == null && attempts < MAX_ATTEMPTS) {
 			try {
 				try {
 					mThingState = iotDiscoveryManager.registerThing(mThing);
@@ -305,6 +310,44 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 		}
 		if (mThingState == null) {
 			LOGGER.log(Level.SEVERE, "Could not register thing after " + MAX_ATTEMPTS + " attempts");
+			return;
 		}
+
+		withMainActivity((ma) -> {
+			final Jid registry = mThingState.getRegistry();
+			ma.runOnUiThread(() -> {
+				Toast.makeText(ma, "Thing registered with " + registry, Toast.LENGTH_LONG).show();
+			});
+			IotThingInfoView thingInfo = new IotThingInfoView(ma, "Registry", registry);
+			replace(ma.mIotThingInfosLinearLayout, thingInfo);
+		});
+
+		mThingState.setThingStateChangeListener(new ThingStateChangeListener() {
+			@Override
+			public void owned(BareJid owner) {
+				withMainActivity((ma) -> {
+					ma.runOnUiThread(() -> {
+						Toast.makeText(ma, "Thing owned by " + owner, Toast.LENGTH_LONG).show();
+					});
+					IotThingInfoView thingInfo = new IotThingInfoView(ma, "Owner", owner);
+					replace(ma.mIotThingInfosLinearLayout, thingInfo);
+				});
+			}
+		});
+	}
+
+	private static void replace(LinearLayout linearLayout, IotThingInfoView updatedThingInfoView) {
+		for (int i = 0; i < linearLayout.getChildCount(); i++) {
+			View v = linearLayout.getChildAt(i);
+			if (!(v instanceof IotThingInfoView)) continue;
+
+			IotThingInfoView thingInfoView = (IotThingInfoView) v;
+
+			if (!thingInfoView.getThingInfoName().equals(updatedThingInfoView.getThingInfoName())) continue;
+
+			linearLayout.removeView(thingInfoView);
+			break;
+		}
+		linearLayout.addView(updatedThingInfoView);
 	}
 }

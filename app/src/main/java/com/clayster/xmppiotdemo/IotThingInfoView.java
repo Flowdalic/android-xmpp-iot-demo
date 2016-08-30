@@ -62,4 +62,8 @@ public class IotThingInfoView extends RelativeLayout {
 		mThingInfoName.setText(name);
 		mThingInfoValue.setText(value);
 	}
+
+	public CharSequence getThingInfoName() {
+		return mThingInfoName.getText();
+	}
 }
