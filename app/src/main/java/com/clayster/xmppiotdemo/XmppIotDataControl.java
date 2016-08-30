@@ -21,6 +21,7 @@ package com.clayster.xmppiotdemo;
 
 import android.content.Context;
 
+import org.asmack.core.AbstractManagedXmppConnectionListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException.XMPPErrorException;
@@ -38,7 +39,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class XmppIotDataControl implements XmppManager.XmppConnectionListener {
+public class XmppIotDataControl {
 
 	private static final Logger LOGGER = Logger.getLogger(XmppIotThing.class.getName());
 
@@ -64,21 +65,18 @@ public class XmppIotDataControl implements XmppManager.XmppConnectionListener {
 		mContext = context.getApplicationContext();
 		mXmppManager = XmppManager.getInstance(mContext);
 		mSettings = Settings.getInstance(mContext);
-		mXmppManager.addXmppConnectionStatusListener(this);
-	}
-
-	@Override
-	public void newConnection(XMPPConnection connection) {
-
-	}
-	@Override
-	public void authenticated(XMPPConnection connection) {
-		withMainActivity((ma) -> setGuiElements(ma, true));
-	}
-
-	@Override
-	public void disconnected(XMPPConnection connection) {
-		withMainActivity((ma) -> setGuiElements(ma, false));
+		mXmppManager.addXmppConnectionStatusListener((ma) -> {
+			ma.addListener(new AbstractManagedXmppConnectionListener() {
+				@Override
+				public void authenticated(XMPPConnection connection, boolean resumed) {
+					withMainActivity((ma) -> setGuiElements(ma, true));
+				}
+				@Override
+				public void terminated() {
+					withMainActivity((ma) -> setGuiElements(ma, false));
+				}
+			});
+		});
 	}
 
 	private static void setGuiElements(MainActivity ma, boolean enabled) {

@@ -140,10 +140,6 @@ public class XmppManager {
 				connection.addAsyncStanzaListener(mMessageListener, MessageWithBodiesFilter.INSTANCE);
 
 				setConnectionState(XmppConnectionState.Authenticated);
-
-				for (XmppConnectionListener listener : mXmppConnectionStatusListeners) {
-					listener.authenticated(connection);
-				}
 			}
 
 			@Override
@@ -172,11 +168,6 @@ public class XmppManager {
 						"Connection state change from " + oldState + " to " + newState, Toast.LENGTH_LONG).show());
 			}
 		});
-
-
-		for (XmppConnectionListener listener : mXmppConnectionStatusListeners) {
-			listener.newConnection(xmppConnection);
-		}
 
 		roster = Roster.getInstanceFor(xmppConnection);
 		roster.setSubscribeListener((from, presence) -> {
@@ -240,9 +231,6 @@ public class XmppManager {
 	private void connectionTerminated() {
 		xmppConnection.removeAsyncStanzaListener(mMessageListener);
 		setConnectionState(XmppConnectionState.Disconnected);
-		for (XmppConnectionListener listener : mXmppConnectionStatusListeners) {
-			listener.disconnected(xmppConnection);
-		}
 	}
 
 	private void maybeSetOtherJidPresenceGui() {
@@ -288,9 +276,7 @@ public class XmppManager {
 	}
 
 	interface XmppConnectionListener {
-		void newConnection(XMPPConnection connection);
-		void authenticated(XMPPConnection connection);
-		void disconnected(XMPPConnection connection);
+		void newConnection(ManagedXmppConnection<XMPPTCPConnection> connection);
 	}
 
 	private void setConnectionState(XmppConnectionState state) {

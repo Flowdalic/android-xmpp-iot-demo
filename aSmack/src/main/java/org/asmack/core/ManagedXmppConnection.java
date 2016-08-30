@@ -55,6 +55,7 @@ public class ManagedXmppConnection<C extends XMPPConnection> {
 			public void connectionClosed() {
 				for (ManagedXmppConnectionListener listener : mListeners) {
 					listener.connectionClosed();
+					listener.terminated();
 				}
 			}
 
@@ -62,6 +63,7 @@ public class ManagedXmppConnection<C extends XMPPConnection> {
 			public void connectionClosedOnError(Exception e) {
 				for (ManagedXmppConnectionListener listener : mListeners) {
 					listener.connectionClosedOnError(e);
+					listener.terminated();
 				}
 			}
 

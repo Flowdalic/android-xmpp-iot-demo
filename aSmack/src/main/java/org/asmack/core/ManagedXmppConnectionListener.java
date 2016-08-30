@@ -29,4 +29,5 @@ public interface ManagedXmppConnectionListener extends ConnectionListener {
 
 	void stateChanged(XmppConnectionState oldState, XmppConnectionState newState, ManagedXmppConnection connection);
 
+	void terminated();
 }

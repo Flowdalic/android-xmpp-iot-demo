@@ -38,4 +38,8 @@ public abstract class AbstractManagedXmppConnectionListener extends AbstractConn
 
 	}
 
+	@Override
+	public void terminated() {
+
+	}
 }

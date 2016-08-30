@@ -30,8 +30,12 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.BatteryManager;
 
+import org.asmack.core.AbstractManagedXmppConnectionListener;
+import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.iot.Thing;
 import org.jivesoftware.smackx.iot.control.IoTControlManager;
 import org.jivesoftware.smackx.iot.control.ThingControlRequest;
@@ -41,20 +45,24 @@ import org.jivesoftware.smackx.iot.data.IoTDataManager;
 import org.jivesoftware.smackx.iot.data.ThingMomentaryReadOutRequest;
 import org.jivesoftware.smackx.iot.data.ThingMomentaryReadOutResult;
 import org.jivesoftware.smackx.iot.data.element.IoTDataField;
+import org.jivesoftware.smackx.iot.discovery.IoTClaimedException;
+import org.jivesoftware.smackx.iot.discovery.IoTDiscoveryManager;
+import org.jivesoftware.smackx.iot.discovery.ThingState;
 import org.jivesoftware.smackx.iot.discovery.element.Tag;
 import org.jxmpp.jid.Jid;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlRequest, SensorEventListener, XmppManager.XmppConnectionListener {
+public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlRequest, SensorEventListener {
 
 	private static final String MANUFACTURER = "Clayster AB";
 	private static final String MODEL = "XMPP IoT Demo";
 	private static final String VERSION = "0.1";
-	private static final String SN = "1";
+	private static final String SN = StringUtils.randomString(8);
 	private static final String KEY = "42";
 
 	private static final Logger LOGGER = Logger.getLogger(XmppIotThing.class.getName());
@@ -71,6 +79,7 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 	private final Context mContext;
 
 	private final Thing mThing;
+	private ThingState mThingState;
 
 	private final SensorManager mSensorManager;
 
@@ -113,27 +122,23 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 			LOGGER.info("No gravity sensor found");
 		}
 
-		XmppManager.getInstance(mContext).addXmppConnectionStatusListener(this);
+		XmppManager.getInstance(mContext).addXmppConnectionStatusListener((ma) -> {
+			XMPPTCPConnection connection = ma.getConnection();
+			IoTDataManager iotDataManager = IoTDataManager.getInstanceFor(connection);
+			iotDataManager.installThing(mThing);
+			IoTControlManager ioTControlManager = IoTControlManager.getInstanceFor(connection);
+			ioTControlManager.installThing(mThing);
+			ma.addListener(new AbstractManagedXmppConnectionListener() {
+				@Override
+				public void authenticated(XMPPConnection connection, boolean resumed) {
+					if (resumed) return;
+					onAuthenticated(connection);
+				}
+			});
+		});
 	}
 
-	@Override
-	public void newConnection(XMPPConnection connection) {
-		IoTDataManager iotDataManager = IoTDataManager.getInstanceFor(connection);
-		iotDataManager.installThing(mThing);
-		IoTControlManager ioTControlManager = IoTControlManager.getInstanceFor(connection);
-		ioTControlManager.installThing(mThing);
-//		IoTProvisioningManager ioTProvisioningManager = IoTProvisioningManager.getInstanceFor(connection);
-	}
-
-	@Override
-	public void authenticated(XMPPConnection connection) {
-
-	}
-
-	@Override
-	public void disconnected(XMPPConnection connection) {
-
-	}
+	
 
 	@Override
 	public void momentaryReadOutRequest(ThingMomentaryReadOutResult callback) {
@@ -276,6 +281,29 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 		synchronized (mMainActivityLock) {
 			if (mMainActivity == null) return;
 			mMainActivity.runOnUiThread(() -> withMainActivity.withActivity(mMainActivity));
+		}
+	}
+
+	private void onAuthenticated(XMPPConnection connection) {
+		IoTDiscoveryManager iotDiscoveryManager = IoTDiscoveryManager.getInstanceFor(connection);
+
+		mThingState = null;
+		final int MAX_ATTEMPTS = 3;
+		int attempts = 0;
+		while (mThingState != null && attempts < MAX_ATTEMPTS) {
+			try {
+				try {
+					mThingState = iotDiscoveryManager.registerThing(mThing);
+				} catch (IoTClaimedException e) {
+					iotDiscoveryManager.unregister();
+				}
+			} catch(XMPPException.XMPPErrorException | InterruptedException | SmackException e) {
+				LOGGER.log(Level.WARNING, "Error registering thing", e);
+			}
+			attempts++;
+		}
+		if (mThingState == null) {
+			LOGGER.log(Level.SEVERE, "Could not register thing after " + MAX_ATTEMPTS + " attempts");
 		}
 	}
 }
