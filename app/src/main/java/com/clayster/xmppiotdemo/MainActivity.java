@@ -35,7 +35,7 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-	private Settings settings;
+	private Settings mSettings;
 
 	/**
 	 * The GUI elements shown if XIOT is not configured yet.
@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
 	private TextView mMyJidTextView;
 	private TextView mOtherJidTextView;
+	private TextView mClaimedJidTextView;
 
 	private XmppManager xmppManager;
 	private XmppIotDataControl mXmppIotDataControl;
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
 	ImageView myJidPresenceImageView;
 	ImageView otherJidPresenceImageView;
+	Button mClaimThingButton;
 	Button mReadOutButton;
 	Switch mContiniousReadOutSwitch;
 
@@ -89,9 +91,11 @@ public class MainActivity extends AppCompatActivity {
 
 		mMyJidTextView = (TextView) findViewById(R.id.my_jid_text_view);
 		mOtherJidTextView = (TextView) findViewById(R.id.otherJidTextView);
+		mClaimedJidTextView = (TextView) findViewById(R.id.claim_thing_text_view);
 
 		myJidPresenceImageView = (ImageView) findViewById(R.id.my_jid_presence_image_view);
 		otherJidPresenceImageView = (ImageView) findViewById(R.id.other_jid_presence_image_view);
+		mClaimThingButton = (Button) findViewById(R.id.claim_thing_activity_button);
 		mReadOutButton = (Button) findViewById(R.id.read_out_button);
 		mContiniousReadOutSwitch = (Switch) findViewById(R.id.continues_read_out_switch);
 		mControlSwitch = (Switch) findViewById(R.id.control_switch);
@@ -101,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
 
 		PreferenceManager.setDefaultValues(this, R.xml.xiot_preferences, false);
 
-		settings = Settings.getInstance(this);
+		mSettings = Settings.getInstance(this);
 
 		mXmppIotThing = XmppIotThing.getInstance(this);
 		mXmppIotThing.mainActivityOnCreate(this);
@@ -115,6 +119,10 @@ public class MainActivity extends AppCompatActivity {
 
 	public void configureButtonClicked(View view) {
 		startActivity(new Intent(this, Setup.class));
+	}
+
+	public void claimThingButtonClicked(View view) {
+		startActivity(new Intent(this, ClaimThingActivity.class));
 	}
 
 	public void enableSwitchToggled(View view) {
@@ -133,11 +141,23 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		MenuItem claimThingOption = menu.findItem(R.id.action_claim_thing);
+		// Only show the claim thing menu option if the identity mode is 'app'.
+		claimThingOption.setEnabled(mSettings.isIdentityModeApp());
+		return true;
+	}
+
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		boolean res = false;
 		switch (item.getItemId()) {
 			case R.id.action_settings:
 				startActivity(new Intent(this, SettingsActivity.class));
+				res = true;
+				break;
+			case R.id.action_claim_thing:
+				startActivity(new Intent(this, ClaimThingActivity.class));
 				res = true;
 				break;
 		}
@@ -147,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		if (settings.isBasicConfigurationDone()) {
+		if (mSettings.isBasicConfigurationDone()) {
 			mSetupLinearLayout.setVisibility(View.GONE);
 			mMainLinearLayout.setVisibility(View.VISIBLE);
 		} else {
@@ -155,18 +175,25 @@ public class MainActivity extends AppCompatActivity {
 			mMainLinearLayout.setVisibility(View.GONE);
 		}
 
-		int appIdentityVisibility = settings.isIdentityModeApp() ? View.VISIBLE : View.GONE;
+		int appIdentityVisibility = mSettings.isIdentityModeApp() ? View.VISIBLE : View.GONE;
 		mAppIdentityLinearLayout.setVisibility(appIdentityVisibility);
 
-		int thingIdentityVisibility = settings.isIdentityModeThing() ? View.VISIBLE : View.GONE;
+		int thingIdentityVisibility = mSettings.isIdentityModeThing() ? View.VISIBLE : View.GONE;
 		mThingIdentityLinearLayout.setVisibility(thingIdentityVisibility);
 
-		if (settings.getOtherJid() != null) {
-			mOtherJidTextView.setText(settings.getOtherJid());
+		if (mSettings.getOtherJid() != null) {
+			mOtherJidTextView.setText(mSettings.getOtherJid());
 		}
 
-		if (settings.getMyJid() != null) {
-			mMyJidTextView.setText(settings.getMyJid());
+		if (mSettings.getMyJid() != null) {
+			mMyJidTextView.setText(mSettings.getMyJid());
+		}
+
+		if (mSettings.getClaimedJid() != null) {
+			mClaimThingButton.setVisibility(View.GONE);
+			mClaimedJidTextView.setText(mSettings.getClaimedJid());
+		} else {
+			mClaimThingButton.setVisibility(View.VISIBLE);
 		}
 	}
 

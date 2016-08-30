@@ -89,6 +89,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
+                    android:maxWidth="200sp"
                     android:hint="My JID not set"
                     android:textAppearance="?android:attr/textAppearanceMedium"/>
 
@@ -98,7 +99,6 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_toEndOf="@+id/my_jid_text_view"
-                    android:layout_toRightOf="@+id/my_jid_text_view"
                     android:src="@android:drawable/presence_offline"/>
             </RelativeLayout>
 
@@ -120,6 +120,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
+                    android:maxWidth="200sp"
                     android:hint="Other JID not set"
                     android:textAppearance="?android:attr/textAppearanceMedium"/>
 
@@ -129,7 +130,6 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_toEndOf="@+id/otherJidTextView"
-                    android:layout_toRightOf="@+id/otherJidTextView"
                     android:src="@android:drawable/presence_offline"/>
             </RelativeLayout>
 
@@ -143,6 +143,46 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/claimed_jid_headline_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Claimed Thing JID"
+                    android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/claimed_jid_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:maxWidth="200sp"
+                        android:hint="No thing claimed"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                    <ImageView
+                        android:id="@+id/claimed_jid_presence_image_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@+id/claimed_jid_text_view"
+                        android:src="@android:drawable/presence_offline"/>
+                </RelativeLayout>
+
+                <Button
+                    android:id="@+id/claim_thing_activity_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:onClick="claimThingButtonClicked"
+                    android:enabled="false"
+                    android:text="Claim Thing"/>
 
                 <TextView
                     android:id="@+id/data_section_headline_text_view"

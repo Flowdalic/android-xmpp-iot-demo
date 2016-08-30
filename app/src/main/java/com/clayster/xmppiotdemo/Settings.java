@@ -54,6 +54,7 @@ public class Settings {
 	private static final String MY_JID_KEY = "MY_JID";
 	private static final String PASSWORD_KEY = "PASSWORD";
 	private static final String OTHER_JID_KEY = "OTHER_JID";
+	private static final String CLAIMED_JID_KEY = "CLAIMED_JID";
 
 	private static final String IDENTIY_MODE_KEY = "pref_identityMode";
 
@@ -62,6 +63,7 @@ public class Settings {
 
 	private EntityBareJid myJidCache;
 	private EntityBareJid otherJidCache;
+	private EntityBareJid claimedJidCache;
 	private XMPPTCPConnectionConfiguration.Builder confBuilderCache;
 
 	private Settings(Context context) {
@@ -139,6 +141,22 @@ public class Settings {
 		return otherJidCache;
 	}
 
+	void setClaimedJid(EntityBareJid claimedJid) {
+		preferences.edit().putString(CLAIMED_JID_KEY, claimedJid.toString()).apply();
+	}
+
+	public EntityBareJid getClaimedJid() {
+		if (claimedJidCache == null) {
+			String claimedJidString = preferences.getString(CLAIMED_JID_KEY, null);
+			if (claimedJidString == null) return null;
+			try {
+				claimedJidCache = JidCreate.entityBareFrom(claimedJidString);
+			} catch (XmppStringprepException e) {
+				throw new IllegalStateException(e);
+			}
+		}
+		return claimedJidCache;
+	}
 	public void populateEditTexts(EditText myJidText, EditText passwordText, EditText otherJidText) {
 		String myJid = preferences.getString(MY_JID_KEY, null);
 		if (myJid != null) myJidText.setText(myJid);

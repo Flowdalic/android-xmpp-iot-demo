@@ -208,9 +208,6 @@ public class XmppManager {
 		}
 		if (xmppConnection == null) return;
 
-		boolean connectionUsable = xmppConnection.isAuthenticated();
-		mainActivity.mReadOutButton.setEnabled(connectionUsable);
-		mainActivity.mContiniousReadOutSwitch.setEnabled(connectionUsable);
 		maybeSetOtherJidPresenceGui();
 		maybeUpdateConnectionStateGui();
 	}
