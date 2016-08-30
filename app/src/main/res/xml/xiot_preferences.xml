@@ -35,4 +35,9 @@
         android:entryValues="@array/pref_identityMode_values"
         android:defaultValue="@string/pref_identityMode_default" />
 
+    <CheckBoxPreference
+        android:key="@string/iot_claim_enabled_pref_key"
+        android:title="Enable IoT 'claim' support"
+        android:defaultValue="false"/>
+
 </PreferenceScreen>

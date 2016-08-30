@@ -61,6 +61,8 @@ public class Settings {
 	private static final String THING_SN_KEY = "pref_thingSn";
 	private static final String REQUIRES_FIRST_TIME_SETUP_KEY = "pref_requireFirstTimeSetup";
 
+	private final String IOT_CLAIM_ENABLED_KEY;
+
 	private final SharedPreferences preferences;
 	private final MemorizingTrustManager mMemorizingTrustManager;
 
@@ -72,6 +74,8 @@ public class Settings {
 	private Settings(Context context) {
 		this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		mMemorizingTrustManager = new MemorizingTrustManager(context.getApplicationContext());
+
+		IOT_CLAIM_ENABLED_KEY = context.getResources().getString(R.string.iot_claim_enabled_pref_key);
 	}
 
 	public void saveBasics(@NonNull EntityBareJid myJid, @NonNull CharSequence password, @NonNull EntityBareJid otherJid) {
@@ -228,7 +232,7 @@ public class Settings {
 	}
 
 	public boolean showClaimGuiElements() {
-		return false;
+		return preferences.getBoolean(IOT_CLAIM_ENABLED_KEY, false);
 	}
 
 	public boolean firstTimeSetupRequired() {

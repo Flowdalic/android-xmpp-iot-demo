@@ -25,4 +25,5 @@
         <item>app</item>
         <item>thing</item>
     </string-array>
+    <string name="iot_claim_enabled_pref_key">pref_iotClaimEnabled</string>
 </resources>
