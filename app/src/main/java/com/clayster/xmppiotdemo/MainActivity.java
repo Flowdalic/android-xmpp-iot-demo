@@ -186,6 +186,10 @@ public class MainActivity extends AppCompatActivity {
 				startActivity(new Intent(this, ClaimThingActivity.class));
 				res = true;
 				break;
+			case R.id.action_about:
+				startActivity(new Intent(this, AboutActivity.class));
+				res = true;
+				break;
 		}
 		return res;
 	}

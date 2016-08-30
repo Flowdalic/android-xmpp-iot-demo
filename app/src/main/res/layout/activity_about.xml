@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright ⓒ 2016 Florian Schmaus.
+  ~
+  ~ This file is part of XIOT.
+  ~
+  ~ XIOT is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ XIOT is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with XIOT.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/about_xiot_title_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:text="XIOT"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+
+        <TextView
+            android:id="@+id/about_xiot_subtitle_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="XMPP Internet of Things Demo App"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+        <TextView
+            android:id="@+id/about_xiot_version_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Version 0.1"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            />
+
+
+        <TextView
+            android:id="@+id/about_xiot_license_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Licensed under the GNU General Public License version 3, or (at your option) any later version "
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+        <TextView
+            android:id="@+id/about_xiot_copyright_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Copyright 2016 Florian Schmaus"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:background="?android:attr/dividerHorizontal"
+            />
+
+        <TextView
+            android:id="@+id/about_open_source_title_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Open Source"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            />
+
+        <TextView
+            android:id="@+id/about_asmack_title_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="aSmack - Android Smack"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+        <TextView
+            android:id="@+id/about_asmack_version_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Version 0.1"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+        <TextView
+            android:id="@+id/about_asmack_url_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="asmack.org"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+        <TextView
+            android:id="@+id/about_asmack_license_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Licensed under the GNU General Public License version 3, or (at your option) any later version."
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+        <TextView
+            android:id="@+id/about_asmack_copyright_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Copyright 2016 Florian Schmaus"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            />
+
+        <TextView
+            android:id="@+id/about_smack_title_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Smack"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+        <TextView
+            android:id="@+id/about_smack_url_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="igniterealtime.org/projects/smack"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+        <TextView
+            android:id="@+id/about_smack_version_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Version 3.2"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+        <TextView
+            android:id="@+id/about_smack_copyright_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="[Smack copyright]"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+        <TextView
+            android:id="@+id/about_smack_license_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Licensed under the Apache License version 2.0."
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            />
+
+        <TextView
+            android:id="@+id/about_mtm_title_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Memorizing Trust Manager"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+        <TextView
+            android:id="@+id/about_mtm_url_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="github.com/ge0rg/MemorizingTrustManager"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+        <TextView
+            android:id="@+id/about_mtm_version_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Version 28ce9d4"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+        <TextView
+            android:id="@+id/about_mtm_license_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Licensed under the MIT license (MIT)"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+        <TextView
+            android:id="@+id/about_mtm_copyright_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="[MTM copyright]"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+    </LinearLayout>
+
+</ScrollView>
