@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
 	 */
 	private LinearLayout mThingIdentityLinearLayout;
 
-	private LinearLayout mThingJidLinearLayout;
 	private LinearLayout mIotClaimedLinearLayout;
 
 	LinearLayout mIotSensorsLinearLayout;
@@ -110,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
 		mThingIdentityLinearLayout = (LinearLayout) findViewById(R.id.thing_identity_linear_layout);
 		mAppIdentityLinearLayout = (LinearLayout) findViewById(R.id.app_identity_linear_layout);
 
-		mThingJidLinearLayout = (LinearLayout) findViewById(R.id.thing_jid_linear_layout);
 		mIotClaimedLinearLayout = (LinearLayout) findViewById(R.id.iot_claiming_linear_layout);
 
 		mSetupLinearLayout = (LinearLayout) findViewById(R.id.setup_linear_layout);
@@ -207,8 +205,6 @@ public class MainActivity extends AppCompatActivity {
 
 		int appIdentityVisibility = mSettings.isIdentityModeApp() ? View.VISIBLE : View.GONE;
 		mAppIdentityLinearLayout.setVisibility(appIdentityVisibility);
-		// We want the thing JID visible if the identity is 'app'.
-		mThingJidLinearLayout.setVisibility(appIdentityVisibility);
 
 		int thingIdentityVisibility = mSettings.isIdentityModeThing() ? View.VISIBLE : View.GONE;
 		mThingIdentityLinearLayout.setVisibility(thingIdentityVisibility);

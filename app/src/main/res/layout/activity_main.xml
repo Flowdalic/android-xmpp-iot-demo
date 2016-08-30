@@ -102,44 +102,36 @@
                     android:src="@android:drawable/presence_offline"/>
             </RelativeLayout>
 
-            <LinearLayout
-                android:id="@+id/thing_jid_linear_layout"
+            <TextView
+                android:id="@+id/thing_jid_headline_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Thing JID"
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:gravity="center">
 
                 <TextView
-                    android:id="@+id/thing_jid_headline_text_view"
+                    android:id="@+id/otherJidTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Thing JID"
-                    android:textAppearance="?android:attr/textAppearanceLarge"/>
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:hint="Other JID not set"
+                    android:maxWidth="200sp"
+                    android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
+                <ImageView
+                    android:id="@+id/other_jid_presence_image_view"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center">
-
-                    <TextView
-                        android:id="@+id/otherJidTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:layout_alignParentTop="true"
-                        android:hint="Other JID not set"
-                        android:maxWidth="200sp"
-                        android:textAppearance="?android:attr/textAppearanceMedium"/>
-
-                    <ImageView
-                        android:id="@+id/other_jid_presence_image_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toEndOf="@+id/otherJidTextView"
-                        android:src="@android:drawable/presence_offline"/>
-                </RelativeLayout>
-
-            </LinearLayout>
+                    android:layout_centerVertical="true"
+                    android:layout_toEndOf="@+id/otherJidTextView"
+                    android:src="@android:drawable/presence_offline"/>
+            </RelativeLayout>
 
             <Space
                 android:layout_width="match_parent"
