@@ -58,6 +58,8 @@ public class Settings {
 
 	private static final String IDENTIY_MODE_KEY = "pref_identityMode";
 
+	private static final String THING_SN_KEY = "pref_thingSn";
+
 	private final SharedPreferences preferences;
 	private final MemorizingTrustManager mMemorizingTrustManager;
 
@@ -206,5 +208,14 @@ public class Settings {
 			default:
 				return false;
 		}
+	}
+
+	public String getThingSerialNumber() {
+		String sn = preferences.getString(THING_SN_KEY, null);
+		if (sn == null) {
+			sn = StringUtils.randomString(8);
+			preferences.edit().putString(THING_SN_KEY, sn);
+		}
+		return sn;
 	}
 }

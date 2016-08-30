@@ -35,7 +35,6 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
-import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.iot.Thing;
 import org.jivesoftware.smackx.iot.control.IoTControlManager;
 import org.jivesoftware.smackx.iot.control.ThingControlRequest;
@@ -62,7 +61,6 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 	private static final String MANUFACTURER = "Clayster AB";
 	private static final String MODEL = "XMPP IoT Demo";
 	private static final String VERSION = "0.1";
-	private static final String SN = StringUtils.randomString(8);
 	private static final String KEY = "42";
 
 	private static final Logger LOGGER = Logger.getLogger(XmppIotThing.class.getName());
@@ -77,6 +75,8 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 	}
 
 	private final Context mContext;
+
+	private final Settings mSettings;
 
 	private final Thing mThing;
 	private ThingState mThingState;
@@ -94,11 +94,12 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 
 	private XmppIotThing(Context context) {
 		mContext = context.getApplicationContext();
+		mSettings = Settings.getInstance(mContext);
 		mThing = Thing.builder()
 				.setManufacturer(MANUFACTURER)
 				.setModel(MODEL)
 				.setVersion(VERSION)
-				.setSerialNumber(SN)
+				.setSerialNumber(mSettings.getThingSerialNumber())
 				.setKey(KEY)
 				.setMomentaryReadOutRequestHandler(this)
 				.setControlRequestHandler(this)
