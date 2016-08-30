@@ -42,7 +42,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Registry: <unknown>"
+        android:text="Registry: [unknown]"
         android:id="@+id/registry_text_view"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/claim_thing_text_view"/>

@@ -117,6 +117,10 @@ public class XmppManager {
 		XMPPTCPConnectionConfiguration conf = builder.build();
 
 		xmppConnection = asmackManager.createManagedConnection(conf);
+
+		// Disable SM (for now).
+		xmppConnection.setUseStreamManagement(false);
+
 		ManagedXmppConnection<XMPPTCPConnection> managedXmppConnection = asmackManager.getManagedXmppConnectionFor(xmppConnection);
 		managedXmppConnection.addListener(new AbstractManagedXmppConnectionListener() {
 			@Override
@@ -143,13 +147,9 @@ public class XmppManager {
 			}
 
 			@Override
-			public void connectionClosed() {
-				connectionTerminated();
-			}
-
-			@Override
-			public void connectionClosedOnError(Exception e) {
-				connectionTerminated();
+			public void terminated() {
+				xmppConnection.removeAsyncStanzaListener(mMessageListener);
+				setConnectionState(XmppConnectionState.Disconnected);
 			}
 
 			@Override
@@ -224,11 +224,6 @@ public class XmppManager {
 			Message message = (Message) stanza;
 			withMainActivity((ma) -> Toast.makeText(ma, "XIOT: " + message.getBody(), Toast.LENGTH_LONG).show());
 	};
-
-	private void connectionTerminated() {
-		xmppConnection.removeAsyncStanzaListener(mMessageListener);
-		setConnectionState(XmppConnectionState.Disconnected);
-	}
 
 	private void maybeSetOtherJidPresenceGui() {
 		Presence presence = roster.getPresence(settings.getOtherJid());
