@@ -14,14 +14,7 @@
             <option value="/data/flo/code/android-xmpp-iot-demo/app" />
           </set>
         </option>
-        <option name="myModules">
-          <set>
-            <option value="/data/flo/code/android-xmpp-iot-demo" />
-            <option value="/data/flo/code/android-xmpp-iot-demo/MemorizingTrustManager" />
-            <option value="/data/flo/code/android-xmpp-iot-demo/aSmack" />
-            <option value="/data/flo/code/android-xmpp-iot-demo/app" />
-          </set>
-        </option>
+        <option name="resolveModulePerSourceSet" value="false" />
       </GradleProjectSettings>
     </option>
   </component>

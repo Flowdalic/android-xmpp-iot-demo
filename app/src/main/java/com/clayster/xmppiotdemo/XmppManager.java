@@ -174,7 +174,7 @@ public class XmppManager {
 		});
 
 		roster = Roster.getInstanceFor(xmppConnection);
-		roster.setSubscribeListener((from, presence) -> {
+		roster.addSubscribeListener((from, presence) -> {
 			if (from.equals(settings.getOtherJid())) {
 				return SubscribeListener.SubscribeAnswer.Approve;
 			} else {
