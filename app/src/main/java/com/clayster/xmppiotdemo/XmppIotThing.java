@@ -291,6 +291,9 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 	}
 
 	private void onAuthenticated(XMPPConnection connection) {
+		// If XIOT is not a thing, then we don't need to do anything here.
+		if (!mSettings.isIdentityModeThing()) return;
+
 		IoTDiscoveryManager iotDiscoveryManager = IoTDiscoveryManager.getInstanceFor(connection);
 
 		mThingState = null;
