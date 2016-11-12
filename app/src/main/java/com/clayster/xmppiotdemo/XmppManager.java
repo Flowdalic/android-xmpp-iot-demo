@@ -113,6 +113,15 @@ public class XmppManager {
 
 		builder.setDebuggerEnabled(true);
 
+		String resourceString = settings.getIdentityMode().toString() + '-' + StringUtils.randomString(4);
+		Resourcepart resource;
+		try {
+			resource = Resourcepart.from(resourceString);
+		} catch (XmppStringprepException e) {
+			throw new IllegalStateException(e);
+		}
+		builder.setResource(resource);
+
 		XMPPTCPConnectionConfiguration conf = builder.build();
 
 		xmppConnection = asmackManager.createManagedConnection(conf);
