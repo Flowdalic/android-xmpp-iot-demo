@@ -33,6 +33,8 @@ import org.jivesoftware.smackx.iot.control.element.SetBoolData;
 import org.jivesoftware.smackx.iot.data.IoTDataManager;
 import org.jivesoftware.smackx.iot.data.element.IoTDataField;
 import org.jivesoftware.smackx.iot.data.element.IoTFieldsExtension;
+import org.jivesoftware.smackx.iot.provisioning.IoTProvisioningManager;
+import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.EntityFullJid;
 
 import java.util.List;
@@ -70,6 +72,14 @@ public class XmppIotDataControl {
 				@Override
 				public void authenticated(XMPPConnection connection, boolean resumed) {
 					withMainActivity((ma) -> setGuiElements(ma, true));
+
+					EntityBareJid thingJid = mSettings.getOtherJid();
+					IoTProvisioningManager provisioningManager = IoTProvisioningManager.getInstanceFor(connection);
+					try {
+						provisioningManager.sendFriendshipRequestIfRequired(thingJid);
+					} catch (SmackException.NotConnectedException | InterruptedException e) {
+						LOGGER.log(Level.WARNING, "Could not befriend thing", e);
+					}
 				}
 				@Override
 				public void terminated() {

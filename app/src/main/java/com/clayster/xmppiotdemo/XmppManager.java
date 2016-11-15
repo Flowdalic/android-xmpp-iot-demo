@@ -29,7 +29,6 @@ import org.asmack.core.AndroidSmackManager;
 import org.asmack.core.ManagedXmppConnection;
 import org.asmack.core.XmppConnectionState;
 import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.MessageWithBodiesFilter;
@@ -37,18 +36,16 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.AbstractRosterListener;
 import org.jivesoftware.smack.roster.Roster;
-import org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smack.roster.RosterListener;
-import org.jivesoftware.smack.roster.SubscribeListener;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smack.util.StringUtils;
 import org.jxmpp.jid.EntityFullJid;
 import org.jxmpp.jid.parts.Resourcepart;
 import org.jxmpp.stringprep.XmppStringprepException;
 
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class XmppManager {
@@ -144,15 +141,6 @@ public class XmppManager {
 			@Override
 			public void authenticated(XMPPConnection connection, boolean resumed) {
 				maybeSetOtherJidPresenceGui();
-				RosterEntry otherJidEntry = roster.getEntry(settings.getOtherJid());
-
-				if (otherJidEntry == null || (!otherJidEntry.canSeeHisPresence() && !otherJidEntry.isSubscriptionPending())) {
-					try {
-						roster.sendSubscriptionRequest(settings.getOtherJid());
-					} catch (SmackException.NotLoggedInException | SmackException.NotConnectedException | InterruptedException e) {
-						LOGGER.log(Level.SEVERE, "Could not send subscription request to other JID", e);
-					}
-				}
 
 				connection.addAsyncStanzaListener(mMessageListener, MessageWithBodiesFilter.INSTANCE);
 
@@ -183,13 +171,6 @@ public class XmppManager {
 		});
 
 		roster = Roster.getInstanceFor(xmppConnection);
-		roster.addSubscribeListener((from, presence) -> {
-			if (from.equals(settings.getOtherJid())) {
-				return SubscribeListener.SubscribeAnswer.Approve;
-			} else {
-				return SubscribeListener.SubscribeAnswer.Deny;
-			}
-		});
 		mRosterListener = new AbstractRosterListener() {
 			@Override
 			public void presenceChanged(Presence presence) {

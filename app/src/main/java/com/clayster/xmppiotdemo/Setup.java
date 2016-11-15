@@ -23,13 +23,14 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.util.JidUtil;
 import org.jxmpp.stringprep.XmppStringprepException;
 
 public class Setup extends AppCompatActivity {
+
+	private Settings mSettings;
 
 	private EditText myJidText;
 	private EditText passwordText;
@@ -40,6 +41,8 @@ public class Setup extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_setup);
 
+		mSettings = Settings.getInstance(this);
+
 		myJidText = (EditText) findViewById(R.id.myJidText);
 		passwordText = (EditText) findViewById(R.id.passwordText);
 		otherJidText = (EditText) findViewById(R.id.otherJidText);
@@ -48,6 +51,14 @@ public class Setup extends AppCompatActivity {
 
 		JidTextWatcher.watch(myJidText);
 		JidTextWatcher.watch(otherJidText);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		int otherJidTextVisibility = mSettings.isIdentityModeApp() ? View.VISIBLE : View.GONE;
+		otherJidText.setVisibility(otherJidTextVisibility);
 	}
 
 	public void saveButtonClicked(View view) {
@@ -65,12 +76,14 @@ public class Setup extends AppCompatActivity {
 			return;
 		}
 
-		EntityBareJid otherJid;
-		try {
-			otherJid = JidUtil.validateEntityBareJid(otherJidText.getText());
-		} catch (JidUtil.NotAEntityBareJidStringException | XmppStringprepException e) {
-			myJidText.setError("Invalid JID: " + e.getLocalizedMessage());
-			return;
+		EntityBareJid otherJid = null;
+		if (mSettings.isIdentityModeApp()) {
+			try {
+				otherJid = JidUtil.validateEntityBareJid(otherJidText.getText());
+			} catch (JidUtil.NotAEntityBareJidStringException | XmppStringprepException e) {
+				myJidText.setError("Invalid JID: " + e.getLocalizedMessage());
+				return;
+			}
 		}
 
 		Settings.getInstance(this).saveBasics(myJid, password, otherJid);

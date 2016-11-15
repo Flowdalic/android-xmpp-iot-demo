@@ -76,20 +76,40 @@ public class Settings {
 		mMemorizingTrustManager = new MemorizingTrustManager(context.getApplicationContext());
 
 		IOT_CLAIM_ENABLED_KEY = context.getResources().getString(R.string.iot_claim_enabled_pref_key);
+
+		preferences.registerOnSharedPreferenceChangeListener((p, k) -> {
+			switch (k) {
+				case IDENTIY_MODE_KEY:
+					String newIdentityMode = p.getString(IDENTIY_MODE_KEY, "");
+					switch (newIdentityMode) {
+						case "thing":
+					}
+					break;
+			}
+		});
 	}
 
-	public void saveBasics(@NonNull EntityBareJid myJid, @NonNull CharSequence password, @NonNull EntityBareJid otherJid) {
-		preferences.edit()
+	public void saveBasics(@NonNull EntityBareJid myJid, @NonNull CharSequence password, EntityBareJid otherJid) {
+		SharedPreferences.Editor editor = preferences.edit()
 				.putString(MY_JID_KEY, myJid.toString())
-				.putString(PASSWORD_KEY, password.toString())
-				.putString(OTHER_JID_KEY, otherJid.toString()).apply();
+				.putString(PASSWORD_KEY, password.toString());
+		if (otherJid != null) {
+			editor.putString(OTHER_JID_KEY, otherJid.toString());
+		}
+		editor.apply();
+
 		myJidCache = myJid;
 		otherJidCache = otherJid;
 		confBuilderCache = null;
 	}
 
+	public void saveOwner(@NonNull EntityBareJid owner) {
+		preferences.edit().putString(OTHER_JID_KEY, owner.toString()).apply();
+		otherJidCache = owner;
+	}
+
 	public boolean isBasicConfigurationDone() {
-		return getMyJid() != null && StringUtils.isNotEmpty(getPassword()) && getOtherJid() != null;
+		return getMyJid() != null && StringUtils.isNotEmpty(getPassword()); // && getOtherJid() != null;
 	}
 
 	public XMPPTCPConnectionConfiguration.Builder getConnectionConfigBuilder() {
@@ -178,7 +198,6 @@ public class Settings {
 	enum IdentityMode {
 		app,
 		thing,
-		both,
 	}
 
 	void firstTimeSetup(IdentityMode identityMode) {
@@ -191,8 +210,6 @@ public class Settings {
 	public IdentityMode getIdentityMode() {
 		String identityMode = preferences.getString(IDENTIY_MODE_KEY, "both");
 		switch (identityMode) {
-			case "both":
-				return IdentityMode.both;
 			case "app":
 				return IdentityMode.app;
 			case "thing":
@@ -205,7 +222,6 @@ public class Settings {
 	public boolean isIdentityModeApp() {
 		switch (getIdentityMode()) {
 			case app:
-			case both:
 				return true;
 			default:
 				return false;
@@ -215,7 +231,6 @@ public class Settings {
 	public boolean isIdentityModeThing() {
 		switch (getIdentityMode()) {
 			case thing:
-			case both:
 				return true;
 			default:
 				return false;

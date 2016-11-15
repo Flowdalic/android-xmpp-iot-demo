@@ -66,7 +66,8 @@ public class MainActivity extends AppCompatActivity {
 	LinearLayout mIotThingInfosLinearLayout;
 
 	private TextView mMyJidTextView;
-	private TextView mOtherJidTextView;
+	private TextView mOtherJidHeadlineTextView;
+	TextView mOtherJidTextView;
 	private TextView mClaimedJidTextView;
 
 	private XmppManager xmppManager;
@@ -91,13 +92,9 @@ public class MainActivity extends AppCompatActivity {
 		if (mSettings.firstTimeSetupRequired()) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle("Please choose App identity")
-					.setMessage("This App can bei either operated as IoT data/control 'App', as IoT 'Thing' or as 'Both'. Please choose one. The selection can be later changed in the App's settings.")
+					.setMessage("This App can bei either operated as IoT data/control 'App', as IoT 'Thing'. Please choose one. The selection can be later changed in the App's settings.")
 					.setNegativeButton("App", (d, i) -> {
 						mSettings.firstTimeSetup(Settings.IdentityMode.app);
-						reload();
-					})
-					.setNeutralButton("Both", (d, i) -> {
-						mSettings.firstTimeSetup(Settings.IdentityMode.both);
 						reload();
 					})
 					.setPositiveButton("Thing", (d, i) -> {
@@ -119,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
 		mIotThingInfosLinearLayout = (LinearLayout) findViewById(R.id.thing_information_infos_linear_layout);
 
 		mMyJidTextView = (TextView) findViewById(R.id.my_jid_text_view);
+		mOtherJidHeadlineTextView = (TextView) findViewById(R.id.other_jid_headline_text_view);
 		mOtherJidTextView = (TextView) findViewById(R.id.otherJidTextView);
 		mClaimedJidTextView = (TextView) findViewById(R.id.claimed_jid_text_view);
 
@@ -231,6 +229,14 @@ public class MainActivity extends AppCompatActivity {
 		} else {
 			mIotClaimedLinearLayout.setVisibility(View.GONE);
 		}
+
+		String otherJidHeadlineText;
+		if (mSettings.isIdentityModeThing()) {
+			otherJidHeadlineText = "Owner JID";
+		} else {
+			otherJidHeadlineText = "Thing JID";
+		}
+		mOtherJidHeadlineTextView.setText(otherJidHeadlineText);
 	}
 
 	@Override

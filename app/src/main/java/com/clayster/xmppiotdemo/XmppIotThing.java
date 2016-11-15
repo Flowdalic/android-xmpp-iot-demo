@@ -53,6 +53,7 @@ import org.jivesoftware.smackx.iot.discovery.ThingState;
 import org.jivesoftware.smackx.iot.discovery.ThingStateChangeListener;
 import org.jivesoftware.smackx.iot.discovery.element.Tag;
 import org.jxmpp.jid.BareJid;
+import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.Jid;
 
 import java.util.ArrayList;
@@ -327,13 +328,17 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 
 		mThingState.setThingStateChangeListener(new ThingStateChangeListener() {
 			@Override
-			public void owned(BareJid owner) {
+			public void owned(BareJid bareOwner) {
+				EntityBareJid owner = bareOwner.asEntityBareJidIfPossible();
+				if (owner == null) throw new IllegalStateException("Could not transform to entity bare JID: " + bareOwner);
 				withMainActivity((ma) -> {
 					ma.runOnUiThread(() -> {
 						Toast.makeText(ma, "Thing owned by " + owner, Toast.LENGTH_LONG).show();
 					});
 					IotThingInfoView thingInfo = new IotThingInfoView(ma, "Owner", owner);
 					replace(ma.mIotThingInfosLinearLayout, thingInfo);
+					ma.mOtherJidTextView.setText(owner);
+					mSettings.saveOwner(owner);
 				});
 			}
 		});

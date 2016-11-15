@@ -19,9 +19,8 @@
   -->
 
 <resources>
-    <string name="pref_identityMode_default">both</string>
+    <string name="pref_identityMode_default">app</string>
     <string-array name="pref_identityMode_values">
-        <item>both</item>
         <item>app</item>
         <item>thing</item>
     </string-array>

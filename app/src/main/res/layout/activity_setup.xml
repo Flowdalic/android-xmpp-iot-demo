@@ -59,7 +59,7 @@
         android:layout_below="@+id/passwordText"
         android:layout_alignLeft="@+id/passwordText"
         android:layout_alignStart="@+id/passwordText"
-        android:hint="otherJid@example.org"/>
+        android:hint="thingJid@example.org"/>
 
     <Button
         android:layout_width="wrap_content"
