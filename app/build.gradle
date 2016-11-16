@@ -77,3 +77,23 @@ dependencies {
     // Disabled java-pinning is currently not used as we use the MemorizingTrustManager
     //    compile 'eu.geekplace.javapinning:java-pinning-aar:1.0.1'
 }
+
+class CreateFileTask extends DefaultTask {
+	@Input
+	String fileContent
+
+	@OutputFile
+	File outputFile
+
+	@TaskAction
+	def createFile() {
+		outputFile.text = fileContent
+	}
+}
+
+task createVersionResource(type: CreateFileTask) {
+	fileContent = android.defaultConfig.versionName + ' (' + gitCommit + ' ' + builtDate + ')'
+	outputFile = new File(projectDir, 'src/main/res/raw/xiot_version')
+}
+
+preBuild.dependsOn(createVersionResource)

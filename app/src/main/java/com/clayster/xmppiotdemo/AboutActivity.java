@@ -26,10 +26,13 @@ import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.widget.TextView;
 
+import org.asmack.core.ASmackVersion;
 import org.jivesoftware.smack.SmackConfiguration;
 
 public class AboutActivity extends AppCompatActivity {
 
+	private TextView mXiotVersionTextView;
+	private TextView mAsmackVersionTextView;
 	private TextView mAsmackUrlTextView;
 	private TextView mSmackUrlTextView;
 	private TextView mSmackVersionTextView;
@@ -42,12 +45,18 @@ public class AboutActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_about);
 
+		mXiotVersionTextView = (TextView) findViewById(R.id.about_xiot_version_text_view);
+		mAsmackVersionTextView = (TextView) findViewById(R.id.about_asmack_version_text_view);
 		mAsmackUrlTextView = (TextView) findViewById(R.id.about_asmack_url_text_view);
 		mSmackUrlTextView = (TextView) findViewById(R.id.about_smack_url_text_view);
 		mSmackVersionTextView = (TextView) findViewById(R.id.about_smack_version_text_view);
 		mSmackCopyrightTextView = (TextView) findViewById(R.id.about_smack_copyright_text_view);
 		mMtmUrlTextview = (TextView) findViewById(R.id.about_mtm_url_text_view);
 		mMtmCopyrightTextView = (TextView) findViewById(R.id.about_mtm_copyright_text_view);
+
+		mXiotVersionTextView.setText(XiotVersion.getVersion(this));
+
+		mAsmackVersionTextView.setText(ASmackVersion.getVersion(this));
 
 		makeLinkTextView(mAsmackUrlTextView, "http://asmack.org", "asmack.org");
 

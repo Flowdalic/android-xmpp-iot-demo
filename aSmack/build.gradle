@@ -36,3 +36,23 @@ dependencies {
     compile 'org.igniterealtime.smack:smack-experimental:4.2.0-beta3-20161106.100648-13'
     compile 'org.igniterealtime.smack:smack-tcp:4.2.0-beta3-20161106.100650-13'
 }
+
+class CreateFileTask extends DefaultTask {
+	@Input
+	String fileContent
+
+	@OutputFile
+	File outputFile
+
+	@TaskAction
+	def createFile() {
+		outputFile.text = fileContent
+	}
+}
+
+task createVersionResource(type: CreateFileTask) {
+	fileContent = android.defaultConfig.versionName + ' (' + gitCommit + ' ' + builtDate + ')'
+	outputFile = new File(projectDir, 'src/main/res/raw/asmack_version')
+}
+
+preBuild.dependsOn(createVersionResource)
