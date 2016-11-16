@@ -6,4 +6,6 @@
         <item>Thing</item>
     </string-array>
 
+    <string name="owner_jid_text_view_unclaimed">Thing not claimed yet.</string>
+
 </resources>

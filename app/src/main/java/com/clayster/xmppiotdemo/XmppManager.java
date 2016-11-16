@@ -22,6 +22,7 @@ package com.clayster.xmppiotdemo;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import org.asmack.core.AbstractManagedXmppConnectionListener;
@@ -40,6 +41,7 @@ import org.jivesoftware.smack.roster.RosterListener;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smack.util.StringUtils;
+import org.jxmpp.jid.BareJid;
 import org.jxmpp.jid.EntityFullJid;
 import org.jxmpp.jid.parts.Resourcepart;
 import org.jxmpp.stringprep.XmppStringprepException;
@@ -140,7 +142,7 @@ public class XmppManager {
 
 			@Override
 			public void authenticated(XMPPConnection connection, boolean resumed) {
-				maybeSetOtherJidPresenceGui();
+				maybeSetJidsPresenceGui();
 
 				connection.addAsyncStanzaListener(mMessageListener, MessageWithBodiesFilter.INSTANCE);
 
@@ -174,8 +176,7 @@ public class XmppManager {
 		mRosterListener = new AbstractRosterListener() {
 			@Override
 			public void presenceChanged(Presence presence) {
-				if (!presence.getFrom().asBareJid().equals(settings.getOtherJid())) return;
-				maybeSetOtherJidPresenceGui();
+				maybeSetJidsPresenceGui();
 			}
 		};
 		roster.addRosterListener(mRosterListener);
@@ -202,7 +203,7 @@ public class XmppManager {
 		}
 		if (xmppConnection == null) return;
 
-		maybeSetOtherJidPresenceGui();
+		maybeSetJidsPresenceGui();
 		maybeUpdateConnectionStateGui();
 	}
 
@@ -219,19 +220,25 @@ public class XmppManager {
 			withMainActivity((ma) -> Toast.makeText(ma, "XIOT: " + message.getBody(), Toast.LENGTH_LONG).show());
 	};
 
-	private void maybeSetOtherJidPresenceGui() {
-		Presence presence = roster.getPresence(settings.getOtherJid());
+	private void maybeSetJidsPresenceGui() {
+		withMainActivity((ma) -> {
+			setJidPresenceGui(ma.mThingJidPresenceImageView, settings.getThingJid());
+			setJidPresenceGui(ma.mOwnerJidPresenceImageView, settings.getOwner());
+		});
+	}
+
+	private void setJidPresenceGui(ImageView imageView, BareJid bareJid) {
+		if (bareJid == null) return;
+
+		Presence presence = roster.getPresence(bareJid);
 		final Drawable drawable;
 		if (presence != null && presence.isAvailable()) {
 			drawable = mOnlineDrawable;
 		} else {
 			drawable = mOfflineDrawable;
 		}
-		withMainActivity((ma) ->
-					ma.otherJidPresenceImageView.setImageDrawable(drawable)
-		);
+		imageView.setImageDrawable(drawable);
 	}
-
 	void withMainActivity(final WithActivity<MainActivity> withMainActivity) {
 		synchronized (mainActivityLock) {
 			if (mainActivity == null) return;
@@ -239,8 +246,8 @@ public class XmppManager {
 		}
 	}
 
-	EntityFullJid getFullOtherJid() {
-		Presence presence = roster.getPresence(settings.getOtherJid());
+	EntityFullJid getFullThingJid() {
+		Presence presence = roster.getPresence(settings.getThingJid());
 		if (presence == null) return null;
 		EntityFullJid fullOtherJid = presence.getFrom().asEntityFullJidIfPossible();
 		if (fullOtherJid == null) throw new IllegalStateException();

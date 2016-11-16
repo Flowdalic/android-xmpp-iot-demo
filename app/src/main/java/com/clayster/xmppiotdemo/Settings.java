@@ -53,7 +53,8 @@ public class Settings {
 
 	private static final String MY_JID_KEY = "MY_JID";
 	private static final String PASSWORD_KEY = "PASSWORD";
-	private static final String OTHER_JID_KEY = "OTHER_JID";
+	private static final String THING_JID_KEY = "THING_JID";
+	private static final String OWNER_JID_KEY = "OWNER_JID";
 	private static final String CLAIMED_JID_KEY = "CLAIMED_JID";
 
 	private static final String IDENTIY_MODE_KEY = "pref_identityMode";
@@ -67,7 +68,8 @@ public class Settings {
 	private final MemorizingTrustManager mMemorizingTrustManager;
 
 	private EntityBareJid myJidCache;
-	private EntityBareJid otherJidCache;
+	private EntityBareJid thingJidCache;
+	private EntityBareJid ownerJidCache;
 	private EntityBareJid claimedJidCache;
 	private XMPPTCPConnectionConfiguration.Builder confBuilderCache;
 
@@ -89,27 +91,46 @@ public class Settings {
 		});
 	}
 
-	public void saveBasics(@NonNull EntityBareJid myJid, @NonNull CharSequence password, EntityBareJid otherJid) {
+	public void saveBasics(@NonNull EntityBareJid myJid, @NonNull CharSequence password, EntityBareJid thingJid) {
 		SharedPreferences.Editor editor = preferences.edit()
 				.putString(MY_JID_KEY, myJid.toString())
 				.putString(PASSWORD_KEY, password.toString());
-		if (otherJid != null) {
-			editor.putString(OTHER_JID_KEY, otherJid.toString());
+		if (thingJid != null) {
+			editor.putString(THING_JID_KEY, thingJid.toString());
 		}
 		editor.apply();
 
 		myJidCache = myJid;
-		otherJidCache = otherJid;
+		thingJidCache = thingJid;
 		confBuilderCache = null;
 	}
 
-	public void saveOwner(@NonNull EntityBareJid owner) {
-		preferences.edit().putString(OTHER_JID_KEY, owner.toString()).apply();
-		otherJidCache = owner;
+	public void saveOwner(EntityBareJid owner) {
+		if (owner != null) {
+			preferences.edit().putString(OWNER_JID_KEY, owner.toString()).apply();
+		} else {
+			preferences.edit().remove(OWNER_JID_KEY).apply();
+		}
+		ownerJidCache = owner;
+	}
+
+	public EntityBareJid getOwner() {
+		if (ownerJidCache == null) {
+			String ownerJidString = preferences.getString(OWNER_JID_KEY, null);
+			if (ownerJidString == null) return null;
+			try {
+				myJidCache = JidCreate.entityBareFrom(ownerJidString);
+			} catch (XmppStringprepException e) {
+				throw new IllegalStateException(e);
+			}
+		}
+		return myJidCache;
 	}
 
 	public boolean isBasicConfigurationDone() {
-		return getMyJid() != null && StringUtils.isNotEmpty(getPassword()); // && getOtherJid() != null;
+		if (isIdentityModeApp() && getThingJid() == null) return false;
+
+		return getMyJid() != null && StringUtils.isNotEmpty(getPassword());
 	}
 
 	public XMPPTCPConnectionConfiguration.Builder getConnectionConfigBuilder() {
@@ -155,17 +176,17 @@ public class Settings {
 		return preferences.getString(PASSWORD_KEY, null);
 	}
 
-	public EntityBareJid getOtherJid() {
-		if (otherJidCache == null) {
-			String otherJidString = preferences.getString(OTHER_JID_KEY, null);
+	public EntityBareJid getThingJid() {
+		if (thingJidCache == null) {
+			String otherJidString = preferences.getString(THING_JID_KEY, null);
 			if (otherJidString == null) return null;
 			try {
-				otherJidCache = JidCreate.entityBareFrom(otherJidString);
+				thingJidCache = JidCreate.entityBareFrom(otherJidString);
 			} catch (XmppStringprepException e) {
 				throw new IllegalStateException(e);
 			}
 		}
-		return otherJidCache;
+		return thingJidCache;
 	}
 
 	void setClaimedJid(EntityBareJid claimedJid) {
@@ -184,6 +205,7 @@ public class Settings {
 		}
 		return claimedJidCache;
 	}
+
 	public void populateEditTexts(EditText myJidText, EditText passwordText, EditText otherJidText) {
 		String myJid = preferences.getString(MY_JID_KEY, null);
 		if (myJid != null) myJidText.setText(myJid);
@@ -191,7 +213,7 @@ public class Settings {
 		String password = preferences.getString(PASSWORD_KEY, null);
 		if (password != null) passwordText.setText(password);
 
-		String otherJid = preferences.getString(OTHER_JID_KEY, null);
+		String otherJid = preferences.getString(THING_JID_KEY, null);
 		if (otherJid != null) otherJidText.setText(otherJid);
 	}
 

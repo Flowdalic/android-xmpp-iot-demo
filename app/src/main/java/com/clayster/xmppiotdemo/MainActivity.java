@@ -60,14 +60,18 @@ public class MainActivity extends AppCompatActivity {
 	 */
 	private LinearLayout mThingIdentityLinearLayout;
 
+	private LinearLayout mThingJidLinearLayout;
+
+	private LinearLayout mOwnerJidLinearLayout;
+
 	private LinearLayout mIotClaimedLinearLayout;
 
 	LinearLayout mIotSensorsLinearLayout;
 	LinearLayout mIotThingInfosLinearLayout;
 
 	private TextView mMyJidTextView;
-	private TextView mOtherJidHeadlineTextView;
-	TextView mOtherJidTextView;
+	private TextView mThingJidTextView;
+	TextView mOwnerJidTextView;
 	private TextView mClaimedJidTextView;
 
 	private XmppManager xmppManager;
@@ -75,7 +79,9 @@ public class MainActivity extends AppCompatActivity {
 	private XmppIotThing mXmppIotThing;
 
 	ImageView myJidPresenceImageView;
-	ImageView otherJidPresenceImageView;
+	ImageView mThingJidPresenceImageView;
+	ImageView mOwnerJidPresenceImageView;
+
 	Button mClaimThingActivityButton;
 	Button mReadOutButton;
 	Switch mContiniousReadOutSwitch;
@@ -88,6 +94,9 @@ public class MainActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_main);
 
 		mSettings = Settings.getInstance(this);
+
+		// Hack: Reset the owner to 'null'. Ideally we would want to keep the thing's state persistent and a register/unregister mechanism via an UI element.
+		mSettings.saveOwner(null);
 
 		if (mSettings.firstTimeSetupRequired()) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -108,6 +117,8 @@ public class MainActivity extends AppCompatActivity {
 		mThingIdentityLinearLayout = (LinearLayout) findViewById(R.id.thing_identity_linear_layout);
 		mAppIdentityLinearLayout = (LinearLayout) findViewById(R.id.app_identity_linear_layout);
 
+		mThingJidLinearLayout = (LinearLayout) findViewById(R.id.thing_jid_linear_layout);
+		mOwnerJidLinearLayout = (LinearLayout) findViewById(R.id.owner_jid_linear_layout);
 		mIotClaimedLinearLayout = (LinearLayout) findViewById(R.id.iot_claiming_linear_layout);
 
 		mSetupLinearLayout = (LinearLayout) findViewById(R.id.setup_linear_layout);
@@ -116,12 +127,13 @@ public class MainActivity extends AppCompatActivity {
 		mIotThingInfosLinearLayout = (LinearLayout) findViewById(R.id.thing_information_infos_linear_layout);
 
 		mMyJidTextView = (TextView) findViewById(R.id.my_jid_text_view);
-		mOtherJidHeadlineTextView = (TextView) findViewById(R.id.other_jid_headline_text_view);
-		mOtherJidTextView = (TextView) findViewById(R.id.otherJidTextView);
+		mThingJidTextView = (TextView) findViewById(R.id.thing_jid_text_view);
+		mOwnerJidTextView = (TextView) findViewById(R.id.owner_jid_text_view);
 		mClaimedJidTextView = (TextView) findViewById(R.id.claimed_jid_text_view);
 
 		myJidPresenceImageView = (ImageView) findViewById(R.id.my_jid_presence_image_view);
-		otherJidPresenceImageView = (ImageView) findViewById(R.id.other_jid_presence_image_view);
+		mThingJidPresenceImageView = (ImageView) findViewById(R.id.thing_jid_presence_image_view);
+		mOwnerJidPresenceImageView = (ImageView) findViewById(R.id.owner_jid_presence_image_view);
 		mClaimThingActivityButton = (Button) findViewById(R.id.claim_thing_activity_button);
 		mReadOutButton = (Button) findViewById(R.id.read_out_button);
 		mContiniousReadOutSwitch = (Switch) findViewById(R.id.continues_read_out_switch);
@@ -168,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		MenuItem claimThingOption = menu.findItem(R.id.action_claim_thing);
 		// Only show the claim thing menu option if the identity mode is 'app'.
-		claimThingOption.setEnabled(mSettings.showClaimGuiElements());
+		claimThingOption.setVisible(mSettings.showClaimGuiElements());
 		return true;
 	}
 
@@ -205,12 +217,18 @@ public class MainActivity extends AppCompatActivity {
 
 		int appIdentityVisibility = mSettings.isIdentityModeApp() ? View.VISIBLE : View.GONE;
 		mAppIdentityLinearLayout.setVisibility(appIdentityVisibility);
+		mThingJidLinearLayout.setVisibility(appIdentityVisibility);
 
 		int thingIdentityVisibility = mSettings.isIdentityModeThing() ? View.VISIBLE : View.GONE;
 		mThingIdentityLinearLayout.setVisibility(thingIdentityVisibility);
+		mOwnerJidLinearLayout.setVisibility(thingIdentityVisibility);
 
-		if (mSettings.getOtherJid() != null) {
-			mOtherJidTextView.setText(mSettings.getOtherJid());
+		if (mSettings.getThingJid() != null) {
+			mThingJidTextView.setText(mSettings.getThingJid());
+		}
+
+		if (mSettings.getOwner() != null) {
+			mOwnerJidTextView.setText(mSettings.getOwner());
 		}
 
 		if (mSettings.getMyJid() != null) {
@@ -229,14 +247,6 @@ public class MainActivity extends AppCompatActivity {
 		} else {
 			mIotClaimedLinearLayout.setVisibility(View.GONE);
 		}
-
-		String otherJidHeadlineText;
-		if (mSettings.isIdentityModeThing()) {
-			otherJidHeadlineText = "Owner JID";
-		} else {
-			otherJidHeadlineText = "Thing JID";
-		}
-		mOtherJidHeadlineTextView.setText(otherJidHeadlineText);
 	}
 
 	@Override

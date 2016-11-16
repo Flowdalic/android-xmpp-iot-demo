@@ -55,7 +55,7 @@
         android:layout_height="wrap_content"
         android:inputType="textEmailAddress"
         android:ems="10"
-        android:id="@+id/otherJidText"
+        android:id="@+id/thing_jid_edit_text"
         android:layout_below="@+id/passwordText"
         android:layout_alignLeft="@+id/passwordText"
         android:layout_alignStart="@+id/passwordText"
@@ -65,7 +65,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Save"
-        android:layout_below="@+id/otherJidText"
+        android:layout_below="@+id/thing_jid_edit_text"
         android:layout_marginTop="20dp"
         android:layout_centerHorizontal="true"
         android:onClick="saveButtonClicked"/>

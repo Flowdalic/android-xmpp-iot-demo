@@ -34,7 +34,7 @@ public class Setup extends AppCompatActivity {
 
 	private EditText myJidText;
 	private EditText passwordText;
-	private EditText otherJidText;
+	private EditText thingJidEditText;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +45,12 @@ public class Setup extends AppCompatActivity {
 
 		myJidText = (EditText) findViewById(R.id.myJidText);
 		passwordText = (EditText) findViewById(R.id.passwordText);
-		otherJidText = (EditText) findViewById(R.id.otherJidText);
+		thingJidEditText = (EditText) findViewById(R.id.thing_jid_edit_text);
 
-		Settings.getInstance(this).populateEditTexts(myJidText, passwordText, otherJidText);
+		Settings.getInstance(this).populateEditTexts(myJidText, passwordText, thingJidEditText);
 
 		JidTextWatcher.watch(myJidText);
-		JidTextWatcher.watch(otherJidText);
+		JidTextWatcher.watch(thingJidEditText);
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class Setup extends AppCompatActivity {
 		super.onResume();
 
 		int otherJidTextVisibility = mSettings.isIdentityModeApp() ? View.VISIBLE : View.GONE;
-		otherJidText.setVisibility(otherJidTextVisibility);
+		thingJidEditText.setVisibility(otherJidTextVisibility);
 	}
 
 	public void saveButtonClicked(View view) {
@@ -79,7 +79,7 @@ public class Setup extends AppCompatActivity {
 		EntityBareJid otherJid = null;
 		if (mSettings.isIdentityModeApp()) {
 			try {
-				otherJid = JidUtil.validateEntityBareJid(otherJidText.getText());
+				otherJid = JidUtil.validateEntityBareJid(thingJidEditText.getText());
 			} catch (JidUtil.NotAEntityBareJidStringException | XmppStringprepException e) {
 				myJidText.setError("Invalid JID: " + e.getLocalizedMessage());
 				return;

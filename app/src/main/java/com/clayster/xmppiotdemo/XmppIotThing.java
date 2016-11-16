@@ -37,6 +37,8 @@ import org.asmack.core.AbstractManagedXmppConnectionListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.roster.Roster;
+import org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smackx.iot.Thing;
 import org.jivesoftware.smackx.iot.control.IoTControlManager;
@@ -295,6 +297,16 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 		// If XIOT is not a thing, then we don't need to do anything here.
 		if (!mSettings.isIdentityModeThing()) return;
 
+		Roster roster = Roster.getInstanceFor(connection);
+		for (RosterEntry entry : roster.getEntries()) {
+			try {
+				roster.removeEntry(entry);
+			} catch (SmackException.NotLoggedInException | SmackException.NoResponseException | XMPPException.XMPPErrorException
+					| SmackException.NotConnectedException | InterruptedException e) {
+				LOGGER.log(Level.WARNING, "Could not remove roster entry: " + entry, e);
+			}
+		}
+
 		IoTDiscoveryManager iotDiscoveryManager = IoTDiscoveryManager.getInstanceFor(connection);
 
 		mThingState = null;
@@ -322,6 +334,10 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 			ma.runOnUiThread(() -> {
 				Toast.makeText(ma, "Thing registered with " + registry, Toast.LENGTH_LONG).show();
 			});
+
+			// Thing was just registered, ensure that now owner is shown.
+			ma.mOwnerJidTextView.setText(ma.getResources().getString(R.string.owner_jid_text_view_unclaimed));
+
 			IotThingInfoView thingInfo = new IotThingInfoView(ma, "Registry", registry);
 			replace(ma.mIotThingInfosLinearLayout, thingInfo);
 		});
@@ -335,9 +351,8 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 					ma.runOnUiThread(() -> {
 						Toast.makeText(ma, "Thing owned by " + owner, Toast.LENGTH_LONG).show();
 					});
-					IotThingInfoView thingInfo = new IotThingInfoView(ma, "Owner", owner);
-					replace(ma.mIotThingInfosLinearLayout, thingInfo);
-					ma.mOtherJidTextView.setText(owner);
+
+					ma.mOwnerJidTextView.setText(owner);
 					mSettings.saveOwner(owner);
 				});
 			}
@@ -345,17 +360,21 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 	}
 
 	private static void replace(LinearLayout linearLayout, IotThingInfoView updatedThingInfoView) {
+		removeOne(linearLayout, updatedThingInfoView.getThingInfoName());
+		linearLayout.addView(updatedThingInfoView);
+	}
+
+	private static void removeOne(LinearLayout linearLayout, CharSequence infoName) {
 		for (int i = 0; i < linearLayout.getChildCount(); i++) {
 			View v = linearLayout.getChildAt(i);
 			if (!(v instanceof IotThingInfoView)) continue;
 
 			IotThingInfoView thingInfoView = (IotThingInfoView) v;
 
-			if (!thingInfoView.getThingInfoName().equals(updatedThingInfoView.getThingInfoName())) continue;
+			if (!thingInfoView.getThingInfoName().equals(infoName)) continue;
 
 			linearLayout.removeView(thingInfoView);
 			break;
 		}
-		linearLayout.addView(updatedThingInfoView);
 	}
 }
