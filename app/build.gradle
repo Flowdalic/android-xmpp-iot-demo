@@ -14,7 +14,7 @@ repositories {
   mavenCentral()
 }
 
-apply plugin: 'me.tatarka.retrolambda'
+//apply plugin: 'me.tatarka.retrolambda'
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
@@ -24,7 +24,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         applicationId "com.clayster.xmppiotdemo"
@@ -33,7 +33,7 @@ android {
         versionCode 1
         versionName "0.1"
         jackOptions {
-            enabled false
+            enabled true
         }
     }
 
@@ -70,10 +70,10 @@ android {
 
 dependencies {
     testCompile 'junit:junit:4.12'
-    compile project(":aSmack")
-    compile project(":MemorizingTrustManager")
+    compile project(':aSmack')
+    compile project(':MemorizingTrustManager')
     compile 'com.android.support:appcompat-v7:24.1.1'
     compile 'com.android.support:design:24.1.1'
     // Disabled java-pinning is currently not used as we use the MemorizingTrustManager
-//    compile 'eu.geekplace.javapinning:java-pinning-aar:1.0.1'
+    //    compile 'eu.geekplace.javapinning:java-pinning-aar:1.0.1'
 }
