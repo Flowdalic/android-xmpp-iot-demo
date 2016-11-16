@@ -119,12 +119,12 @@ public class Settings {
 			String ownerJidString = preferences.getString(OWNER_JID_KEY, null);
 			if (ownerJidString == null) return null;
 			try {
-				myJidCache = JidCreate.entityBareFrom(ownerJidString);
+				ownerJidCache = JidCreate.entityBareFrom(ownerJidString);
 			} catch (XmppStringprepException e) {
 				throw new IllegalStateException(e);
 			}
 		}
-		return myJidCache;
+		return ownerJidCache;
 	}
 
 	public boolean isBasicConfigurationDone() {
