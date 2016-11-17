@@ -147,8 +147,6 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 		});
 	}
 
-	
-
 	@Override
 	public void momentaryReadOutRequest(ThingMomentaryReadOutResult callback) {
 		List<IoTDataField> res = new ArrayList<>();
