@@ -160,15 +160,17 @@ public class XmppIotDataControl {
 
 	private void performReadOut() {
 		XMPPTCPConnection connection = mXmppManager.getXmppConnection();
-		EntityFullJid fullOtherJid = mXmppManager.getFullThingJid();
+		EntityFullJid fullThingJid = mXmppManager.getFullThingJidOrNotify();
+		if (fullThingJid == null) return;
 
-		LOGGER.info("Requesting read out from " + fullOtherJid);
+		LOGGER.info("Requesting read out from " + fullThingJid);
 
 		IoTDataManager iotDataManager = IoTDataManager.getInstanceFor(connection);
 		final List<IoTFieldsExtension> res;
 		try {
-			res = iotDataManager.requestMomentaryValuesReadOut(fullOtherJid);
+			res = iotDataManager.requestMomentaryValuesReadOut(fullThingJid);
 		} catch (SmackException.NoResponseException | XMPPErrorException | SmackException.NotConnectedException |InterruptedException e) {
+			mXmppManager.withMainActivity((ma) -> Toast.makeText(mContext, "Could not perform read out: " + e, Toast.LENGTH_LONG).show());
 			LOGGER.log(Level.WARNING, "Could not perform read out", e);
 			return;
 		}
@@ -190,14 +192,18 @@ public class XmppIotDataControl {
 
 	private void controlNotificationAlarm(boolean torchMode) {
 		final XMPPTCPConnection connection = mXmppManager.getXmppConnection();
-		final EntityFullJid fullOtherJid = mXmppManager.getFullThingJid();
+		final EntityFullJid fullThingJid = mXmppManager.getFullThingJidOrNotify();
+		if (fullThingJid == null) return;
 
 		SetBoolData setTorch = new SetBoolData(Constants.NOTIFICATION_ALARM, torchMode);
 		IoTControlManager ioTControlManager = IoTControlManager.getInstanceFor(connection);
 
+		LOGGER.info("Trying to control " + fullThingJid + " set torchMode=" + torchMode);
+
 		try {
-			final IoTSetResponse ioTSetResponse = ioTControlManager.setUsingIq(fullOtherJid, setTorch);
+			final IoTSetResponse ioTSetResponse = ioTControlManager.setUsingIq(fullThingJid, setTorch);
 		} catch (SmackException.NoResponseException | XMPPErrorException | SmackException.NotConnectedException | InterruptedException e) {
+			mXmppManager.withMainActivity((ma) -> Toast.makeText(mContext, "Could not control thing: " + e, Toast.LENGTH_LONG).show());
 			LOGGER.log(Level.SEVERE, "Could not set data", e);
 		}
 	}

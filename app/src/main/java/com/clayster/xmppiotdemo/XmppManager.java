@@ -41,7 +41,9 @@ import org.jivesoftware.smack.roster.RosterListener;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smack.util.StringUtils;
+import org.jivesoftware.smackx.iot.provisioning.IoTProvisioningManager;
 import org.jxmpp.jid.BareJid;
+import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.EntityFullJid;
 import org.jxmpp.jid.parts.Resourcepart;
 import org.jxmpp.stringprep.XmppStringprepException;
@@ -239,6 +241,7 @@ public class XmppManager {
 		}
 		imageView.setImageDrawable(drawable);
 	}
+
 	void withMainActivity(final WithActivity<MainActivity> withMainActivity) {
 		synchronized (mainActivityLock) {
 			if (mainActivity == null) return;
@@ -246,11 +249,23 @@ public class XmppManager {
 		}
 	}
 
-	EntityFullJid getFullThingJid() {
+	EntityFullJid getFullThingJidOrNotify() {
+		EntityBareJid thingJid = settings.getThingJid();
+		IoTProvisioningManager ioTProvisioningManager = IoTProvisioningManager.getInstanceFor(xmppConnection);
+
+		if (!ioTProvisioningManager.iAmFriendOf(thingJid)) {
+			withMainActivity((ma) -> Toast.makeText(ma, "Can not perform action. Not befriended with thing", Toast.LENGTH_LONG).show());
+			return null;
+		}
+
 		Presence presence = roster.getPresence(settings.getThingJid());
-		if (presence == null) return null;
+		if (presence == null || !presence.isAvailable()) {
+			withMainActivity((ma) -> Toast.makeText(ma, "Can not perform action. Befriended with thing, but thing is not online/unavailable", Toast.LENGTH_LONG).show());
+			return null;
+		}
+
 		EntityFullJid fullOtherJid = presence.getFrom().asEntityFullJidIfPossible();
-		if (fullOtherJid == null) throw new IllegalStateException();
+		if (fullOtherJid == null) throw new IllegalStateException("Exepected full JID");
 		return fullOtherJid;
 	}
 
