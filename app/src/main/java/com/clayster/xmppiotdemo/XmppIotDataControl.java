@@ -26,8 +26,6 @@ import org.asmack.core.AbstractManagedXmppConnectionListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException.XMPPErrorException;
-import org.jivesoftware.smack.roster.Roster;
-import org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.util.Async;
 import org.jivesoftware.smackx.iot.control.IoTControlManager;
@@ -83,12 +81,10 @@ public class XmppIotDataControl {
 					final EntityBareJid thingJid = mSettings.getThingJid();
 					if (thingJid == null) return;
 					IoTProvisioningManager provisioningManager = IoTProvisioningManager.getInstanceFor(connection);
-					Roster roster = Roster.getInstanceFor(connection);
-					RosterEntry entry = roster.getEntry(thingJid);
-					if (entry == null || !entry.canSeeHisPresence()) {
+					if (!provisioningManager.isMyFriend(thingJid)) {
 						withMainActivity((ma) -> Toast.makeText(ma, "Trying to befriend " + thingJid, Toast.LENGTH_LONG).show());
 						try {
-							provisioningManager.sendFriendshipRequestIfRequired(thingJid);
+							provisioningManager.sendFriendshipRequest(thingJid);
 						} catch (SmackException.NotConnectedException | InterruptedException e) {
 							LOGGER.log(Level.WARNING, "Could not befriend thing", e);
 						}
