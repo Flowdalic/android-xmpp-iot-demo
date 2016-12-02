@@ -26,6 +26,8 @@ import org.asmack.core.AbstractManagedXmppConnectionListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException.XMPPErrorException;
+import org.jivesoftware.smack.roster.Roster;
+import org.jivesoftware.smack.roster.SubscribeListener;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.util.Async;
 import org.jivesoftware.smackx.iot.control.IoTControlManager;
@@ -69,6 +71,17 @@ public class XmppIotDataControl {
 		mXmppManager = XmppManager.getInstance(mContext);
 		mSettings = Settings.getInstance(mContext);
 		mXmppManager.addXmppConnectionStatusListener((ma) -> {
+			Roster roster = Roster.getInstanceFor(ma.getConnection());
+			roster.addSubscribeListener((from, subRequest) -> {
+				if (!mSettings.isIdentityModeApp()) return null;
+				if (!mSettings.isMutualSubscriptionModeEnabled()) return null;
+
+				if (from.equals(mSettings.getThingJid())) {
+					return SubscribeListener.SubscribeAnswer.Approve;
+				}
+				return null;
+			});
+
 			ma.addListener(new AbstractManagedXmppConnectionListener() {
 				@Override
 				public void authenticated(XMPPConnection connection, boolean resumed) {
@@ -77,6 +90,8 @@ public class XmppIotDataControl {
 					if (resumed) return;
 
 					if (!mSettings.isIdentityModeApp()) return;
+
+					XmppManager.emptyRoster(connection);
 
 					final EntityBareJid thingJid = mSettings.getThingJid();
 					if (thingJid == null) return;
@@ -89,6 +104,14 @@ public class XmppIotDataControl {
 							LOGGER.log(Level.WARNING, "Could not befriend thing", e);
 						}
 					}
+					provisioningManager.addBecameFriendListener((friend, presence) -> {
+						if (!mSettings.isIdentityModeApp()) return;
+						withMainActivity((c) -> Toast.makeText(c, "We are now a friend of " + friend, Toast.LENGTH_LONG).show());
+					});
+					provisioningManager.addWasUnfriendedListener((friend, presence) -> {
+						if (!mSettings.isIdentityModeApp()) return;
+						withMainActivity((c) -> Toast.makeText(c, "We are no longer a friend of " + friend, Toast.LENGTH_LONG).show());
+					});
 				}
 				@Override
 				public void terminated() {

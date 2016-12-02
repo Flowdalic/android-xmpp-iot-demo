@@ -144,9 +144,9 @@ public class MainActivity extends AppCompatActivity {
 
 		PreferenceManager.setDefaultValues(this, R.xml.xiot_preferences, false);
 
+		mXmppIotDataControl = XmppIotDataControl.getInstance(this);
 		mXmppIotThing = XmppIotThing.getInstance(this);
 		xmppManager = XmppManager.getInstance(this);
-		mXmppIotDataControl = XmppIotDataControl.getInstance(this);
 
 		mXmppIotThing.mainActivityOnCreate(this);
 		mXmppIotDataControl.mainActivityOnCreate(this);

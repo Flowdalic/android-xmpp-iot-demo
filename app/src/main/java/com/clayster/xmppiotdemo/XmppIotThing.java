@@ -37,8 +37,9 @@ import org.asmack.core.AbstractManagedXmppConnectionListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.filter.PresenceTypeFilter;
+import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.Roster;
-import org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smackx.iot.Thing;
 import org.jivesoftware.smackx.iot.control.IoTControlManager;
@@ -144,6 +145,22 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 					onAuthenticated(connection);
 				}
 			});
+
+			// Try to establish mutual subscription for every entity which we just allowed being
+			// subscribed to our presence, if mutual subscription mode is enabled.
+			connection.addPacketSendingListener((stanza) -> {
+				if (!mSettings.isIdentityModeThing()) return;
+				if (!mSettings.isMutualSubscriptionModeEnabled()) return;
+
+				Presence subscribedPresence = (Presence) stanza;
+				BareJid to = subscribedPresence.getTo().asBareJid();
+				Roster roster = Roster.getInstanceFor(connection);
+				try {
+					roster.sendSubscriptionRequest(to);
+				} catch (SmackException.NotLoggedInException e) {
+					LOGGER.log(Level.WARNING, "Could not send subscription request", e);
+				}
+			}, PresenceTypeFilter.SUBSCRIBED);
 		});
 	}
 
@@ -295,15 +312,7 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 		// If XIOT is not a thing, then we don't need to do anything here.
 		if (!mSettings.isIdentityModeThing()) return;
 
-		Roster roster = Roster.getInstanceFor(connection);
-		for (RosterEntry entry : roster.getEntries()) {
-			try {
-				roster.removeEntry(entry);
-			} catch (SmackException.NotLoggedInException | SmackException.NoResponseException | XMPPException.XMPPErrorException
-					| SmackException.NotConnectedException | InterruptedException e) {
-				LOGGER.log(Level.WARNING, "Could not remove roster entry: " + entry, e);
-			}
-		}
+		XmppManager.emptyRoster(connection);
 
 		IoTDiscoveryManager iotDiscoveryManager = IoTDiscoveryManager.getInstanceFor(connection);
 

@@ -64,6 +64,8 @@ public class Settings {
 
 	private final String IOT_CLAIM_ENABLED_KEY;
 
+	private final String MUTUAL_SUBSCRIPTION_MODE_KEY;
+
 	private final SharedPreferences preferences;
 	private final MemorizingTrustManager mMemorizingTrustManager;
 
@@ -78,6 +80,8 @@ public class Settings {
 		mMemorizingTrustManager = new MemorizingTrustManager(context.getApplicationContext());
 
 		IOT_CLAIM_ENABLED_KEY = context.getResources().getString(R.string.iot_claim_enabled_pref_key);
+
+		MUTUAL_SUBSCRIPTION_MODE_KEY = context.getResources().getString(R.string.mutual_subscription_mode_pref_key);
 
 		preferences.registerOnSharedPreferenceChangeListener((p, k) -> {
 			switch (k) {
@@ -274,5 +278,9 @@ public class Settings {
 
 	public boolean firstTimeSetupRequired() {
 		return preferences.getBoolean(REQUIRES_FIRST_TIME_SETUP_KEY, true);
+	}
+
+	public boolean isMutualSubscriptionModeEnabled() {
+		return preferences.getBoolean(MUTUAL_SUBSCRIPTION_MODE_KEY, false);
 	}
 }

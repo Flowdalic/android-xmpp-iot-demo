@@ -40,4 +40,9 @@
         android:title="Enable IoT 'claim' support"
         android:defaultValue="false"/>
 
+    <CheckBoxPreference
+        android:key="pref_mutualSubscriptionMode"
+        android:title="@string/pref_mutualSubscriptionMode_title"
+        android:defaultValue="false"/>
+
 </PreferenceScreen>

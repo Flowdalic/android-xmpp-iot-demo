@@ -30,13 +30,16 @@ import org.asmack.core.AndroidSmackManager;
 import org.asmack.core.ManagedXmppConnection;
 import org.asmack.core.XmppConnectionState;
 import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.MessageWithBodiesFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.roster.AbstractRosterListener;
 import org.jivesoftware.smack.roster.Roster;
+import org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smack.roster.RosterListener;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
@@ -50,6 +53,7 @@ import org.jxmpp.stringprep.XmppStringprepException;
 
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class XmppManager {
@@ -310,5 +314,17 @@ public class XmppManager {
 		final ManagedXmppConnection<XMPPTCPConnection> managedXmppConnection = mManagedXmppConnection;
 		if (managedXmppConnection == null) return XmppConnectionState.Disconnected;
 		return managedXmppConnection.getState();
+	}
+
+	static void emptyRoster(XMPPConnection connection) {
+		Roster roster = Roster.getInstanceFor(connection);
+		for (RosterEntry entry : roster.getEntries()) {
+			try {
+				roster.removeEntry(entry);
+			} catch (SmackException.NotLoggedInException | SmackException.NoResponseException | XMPPException.XMPPErrorException
+					| SmackException.NotConnectedException | InterruptedException e) {
+				LOGGER.log(Level.WARNING, "Could not remove roster entry: " + entry, e);
+			}
+		}
 	}
 }

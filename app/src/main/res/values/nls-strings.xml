@@ -25,4 +25,5 @@
         <item>thing</item>
     </string-array>
     <string name="iot_claim_enabled_pref_key">pref_iotClaimEnabled</string>
+    <string name="mutual_subscription_mode_pref_key">pref_mutualSubscriptionMode</string>
 </resources>
