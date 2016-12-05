@@ -103,6 +103,8 @@ public class XmppIotDataControl {
 						} catch (SmackException.NotConnectedException | InterruptedException e) {
 							LOGGER.log(Level.WARNING, "Could not befriend thing", e);
 						}
+					} else {
+						LOGGER.info("We are already a friend of " + thingJid + ". Not sending friendship request.");
 					}
 					provisioningManager.addBecameFriendListener((friend, presence) -> {
 						if (!mSettings.isIdentityModeApp()) return;

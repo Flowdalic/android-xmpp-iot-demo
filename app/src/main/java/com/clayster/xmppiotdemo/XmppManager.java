@@ -318,7 +318,21 @@ public class XmppManager {
 
 	static void emptyRoster(XMPPConnection connection) {
 		Roster roster = Roster.getInstanceFor(connection);
-		for (RosterEntry entry : roster.getEntries()) {
+
+		if (!roster.isLoaded()) {
+			LOGGER.info("Reloading roster");
+			try {
+				roster.reloadAndWait();
+			} catch (SmackException.NotLoggedInException | SmackException.NotConnectedException | InterruptedException e) {
+				LOGGER.log(Level.WARNING, "Could not reload roster", e);
+			}
+		} else {
+			LOGGER.info("Roster is loaded. Going to remove entries.");
+		}
+
+		Set<RosterEntry> entries = roster.getEntries();
+		LOGGER.info("Removing all " + entries.size() + " roster entries");
+		for (RosterEntry entry : entries) {
 			try {
 				roster.removeEntry(entry);
 			} catch (SmackException.NotLoggedInException | SmackException.NoResponseException | XMPPException.XMPPErrorException
