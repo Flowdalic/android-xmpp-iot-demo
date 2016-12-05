@@ -97,7 +97,7 @@ public class XmppIotDataControl {
 					if (thingJid == null) return;
 					IoTProvisioningManager provisioningManager = IoTProvisioningManager.getInstanceFor(connection);
 					if (!provisioningManager.iAmFriendOf(thingJid)) {
-						withMainActivity((ma) -> Toast.makeText(ma, "Trying to befriend " + thingJid, Toast.LENGTH_LONG).show());
+						withMainActivity((ma) -> Toast.makeText(ma, "Trying to befriend " + thingJid, Toast.LENGTH_SHORT).show());
 						try {
 							provisioningManager.sendFriendshipRequest(thingJid);
 						} catch (SmackException.NotConnectedException | InterruptedException e) {
@@ -106,11 +106,11 @@ public class XmppIotDataControl {
 					}
 					provisioningManager.addBecameFriendListener((friend, presence) -> {
 						if (!mSettings.isIdentityModeApp()) return;
-						withMainActivity((c) -> Toast.makeText(c, "We are now a friend of " + friend, Toast.LENGTH_LONG).show());
+						withMainActivity((c) -> Toast.makeText(c, "We are now a friend of " + friend, Toast.LENGTH_SHORT).show());
 					});
 					provisioningManager.addWasUnfriendedListener((friend, presence) -> {
 						if (!mSettings.isIdentityModeApp()) return;
-						withMainActivity((c) -> Toast.makeText(c, "We are no longer a friend of " + friend, Toast.LENGTH_LONG).show());
+						withMainActivity((c) -> Toast.makeText(c, "We are no longer a friend of " + friend, Toast.LENGTH_SHORT).show());
 					});
 				}
 				@Override
