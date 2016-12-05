@@ -36,7 +36,11 @@ import android.widget.TextView;
 
 import org.jxmpp.jid.EntityBareJid;
 
+import java.util.logging.Logger;
+
 public class MainActivity extends AppCompatActivity {
+
+	private static final Logger LOGGER = Logger.getLogger(MainActivity.class.getName());
 
 	private Settings mSettings;
 
@@ -200,6 +204,10 @@ public class MainActivity extends AppCompatActivity {
 				startActivity(new Intent(this, AboutActivity.class));
 				res = true;
 				break;
+			case R.id.action_send_feedback:
+				Feedback.shareFeedbackAsync(this);
+				res = true;
+				break;
 		}
 		return res;
 	}
@@ -262,4 +270,5 @@ public class MainActivity extends AppCompatActivity {
 		finish();
 		startActivity(intent);
 	}
+
 }
