@@ -96,7 +96,7 @@ public class XmppIotDataControl {
 					final EntityBareJid thingJid = mSettings.getThingJid();
 					if (thingJid == null) return;
 					IoTProvisioningManager provisioningManager = IoTProvisioningManager.getInstanceFor(connection);
-					if (!provisioningManager.isMyFriend(thingJid)) {
+					if (!provisioningManager.iAmFriendOf(thingJid)) {
 						withMainActivity((ma) -> Toast.makeText(ma, "Trying to befriend " + thingJid, Toast.LENGTH_LONG).show());
 						try {
 							provisioningManager.sendFriendshipRequest(thingJid);
