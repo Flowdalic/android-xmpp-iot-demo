@@ -34,6 +34,7 @@ import org.jxmpp.stringprep.XmppStringprepException;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.logging.Logger;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
@@ -41,6 +42,8 @@ import javax.net.ssl.X509TrustManager;
 import de.duenndns.ssl.MemorizingTrustManager;
 
 public class Settings {
+
+	private static final Logger LOGGER = Logger.getLogger(Settings.class.getName());
 
 	private static Settings INSTANCE;
 
@@ -234,14 +237,16 @@ public class Settings {
 	}
 
 	public IdentityMode getIdentityMode() {
-		String identityMode = preferences.getString(IDENTIY_MODE_KEY, "both");
+		String identityMode = preferences.getString(IDENTIY_MODE_KEY, "thing");
 		switch (identityMode) {
 			case "app":
 				return IdentityMode.app;
 			case "thing":
 				return IdentityMode.thing;
 			default:
-				throw new IllegalStateException();
+				LOGGER.info("Upgrading old identity mode setting '" + identityMode + "' to 'thing' mode.");
+				preferences.edit().putString(IDENTIY_MODE_KEY, "thing");
+				return IdentityMode.thing;
 		}
 	}
 
