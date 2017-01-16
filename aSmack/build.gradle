@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 ext {
-    smackVersion = "4.2.0-beta3"
+    smackVersion = "4.2.0-rc2"
 }
 
 android {
