@@ -104,15 +104,19 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 	private XmppIotThing(Context context) {
 		mContext = context.getApplicationContext();
 		mSettings = Settings.getInstance(mContext);
-		mThing = Thing.builder()
-				.setManufacturer(MANUFACTURER)
-				.setModel(MODEL)
-				.setVersion(VERSION)
+		Thing.Builder thingBuilder = Thing.builder()
 				.setSerialNumber(mSettings.getThingSerialNumber())
-				.setKey(KEY)
 				.setMomentaryReadOutRequestHandler(this)
-				.setControlRequestHandler(this)
-				.build();
+				.setControlRequestHandler(this);
+
+		if (mSettings.isThingFullMetadata()) {
+			thingBuilder.setManufacturer(MANUFACTURER)
+					.setModel(MODEL)
+					.setVersion(VERSION)
+					.setKey(KEY);
+		}
+
+		mThing = thingBuilder.build();
 
 		mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
 		mTemperatureSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);

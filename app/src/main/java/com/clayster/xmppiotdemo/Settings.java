@@ -288,4 +288,8 @@ public class Settings {
 	public boolean isMutualSubscriptionModeEnabled() {
 		return preferences.getBoolean(MUTUAL_SUBSCRIPTION_MODE_KEY, false);
 	}
+
+	public boolean isThingFullMetadata() {
+		return false;
+	}
 }
