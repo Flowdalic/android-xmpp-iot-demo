@@ -39,6 +39,7 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.PresenceTypeFilter;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smackx.iot.Thing;
@@ -50,6 +51,11 @@ import org.jivesoftware.smackx.iot.data.IoTDataManager;
 import org.jivesoftware.smackx.iot.data.ThingMomentaryReadOutRequest;
 import org.jivesoftware.smackx.iot.data.ThingMomentaryReadOutResult;
 import org.jivesoftware.smackx.iot.data.element.IoTDataField;
+import org.jivesoftware.smackx.iot.data.element.IoTDataReadOutAccepted;
+import org.jivesoftware.smackx.iot.data.element.IoTDataRequest;
+import org.jivesoftware.smackx.iot.data.element.IoTFieldsExtension;
+import org.jivesoftware.smackx.iot.data.provider.IoTDataReadOutAcceptedProvider;
+import org.jivesoftware.smackx.iot.data.provider.IoTFieldsExtensionProvider;
 import org.jivesoftware.smackx.iot.discovery.IoTClaimedException;
 import org.jivesoftware.smackx.iot.discovery.IoTDiscoveryManager;
 import org.jivesoftware.smackx.iot.discovery.ThingState;
@@ -73,6 +79,13 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 	private static final String KEY = "42";
 
 	private static final Logger LOGGER = Logger.getLogger(XmppIotThing.class.getName());
+
+	static {
+		// Workaround for provider enties in Smack <= 4.2.0-rc2. Remove when Smack >= 4.2.0-rc3 is used.
+		ProviderManager.addIQProvider(IoTDataRequest.ELEMENT, IoTDataRequest.NAMESPACE, new IoTDataReadOutAcceptedProvider());
+		ProviderManager.addIQProvider(IoTDataReadOutAccepted.ELEMENT, IoTDataReadOutAccepted.NAMESPACE, new IoTDataReadOutAcceptedProvider());
+		ProviderManager.addExtensionProvider(IoTFieldsExtension.ELEMENT, IoTFieldsExtension.NAMESPACE, new IoTFieldsExtensionProvider());
+	}
 
 	private static XmppIotThing INSTANCE;
 
