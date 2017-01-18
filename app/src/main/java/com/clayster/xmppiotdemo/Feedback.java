@@ -64,7 +64,7 @@ class Feedback {
 
 			String line;
 			while ((line = reader.readLine()) != null) {
-				sb.append(line);
+				sb.append(line).append('\n');
 			}
 		} catch (IOException e) {
 			LOGGER.log(Level.SEVERE, "Error retrieving log", e);
