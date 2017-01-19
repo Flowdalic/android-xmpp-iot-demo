@@ -54,6 +54,7 @@ import org.jivesoftware.smackx.iot.data.element.IoTDataField;
 import org.jivesoftware.smackx.iot.data.element.IoTDataReadOutAccepted;
 import org.jivesoftware.smackx.iot.data.element.IoTDataRequest;
 import org.jivesoftware.smackx.iot.data.element.IoTFieldsExtension;
+import org.jivesoftware.smackx.iot.data.provider.IoTDataRequestProvider;
 import org.jivesoftware.smackx.iot.data.provider.IoTDataReadOutAcceptedProvider;
 import org.jivesoftware.smackx.iot.data.provider.IoTFieldsExtensionProvider;
 import org.jivesoftware.smackx.iot.discovery.IoTClaimedException;
@@ -82,7 +83,7 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 
 	static {
 		// Workaround for provider enties in Smack <= 4.2.0-rc2. Remove when Smack >= 4.2.0-rc3 is used.
-		ProviderManager.addIQProvider(IoTDataRequest.ELEMENT, IoTDataRequest.NAMESPACE, new IoTDataReadOutAcceptedProvider());
+		ProviderManager.addIQProvider(IoTDataRequest.ELEMENT, IoTDataRequest.NAMESPACE, new IoTDataRequestProvider());
 		ProviderManager.addIQProvider(IoTDataReadOutAccepted.ELEMENT, IoTDataReadOutAccepted.NAMESPACE, new IoTDataReadOutAcceptedProvider());
 		ProviderManager.addExtensionProvider(IoTFieldsExtension.ELEMENT, IoTFieldsExtension.NAMESPACE, new IoTFieldsExtensionProvider());
 	}
