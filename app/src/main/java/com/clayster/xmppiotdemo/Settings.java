@@ -272,7 +272,7 @@ public class Settings {
 		String sn = preferences.getString(THING_SN_KEY, null);
 		if (sn == null) {
 			sn = StringUtils.randomString(8);
-			preferences.edit().putString(THING_SN_KEY, sn);
+			preferences.edit().putString(THING_SN_KEY, sn).apply();
 		}
 		return sn;
 	}
