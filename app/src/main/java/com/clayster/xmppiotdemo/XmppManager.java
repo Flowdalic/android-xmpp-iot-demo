@@ -317,6 +317,10 @@ public class XmppManager {
 	}
 
 	static void emptyRoster(XMPPConnection connection) {
+		emptyRoster(connection, null);
+	}
+
+	static void emptyRoster(XMPPConnection connection, BareJid keepJid) {
 		Roster roster = Roster.getInstanceFor(connection);
 
 		if (!roster.isLoaded()) {
@@ -331,8 +335,16 @@ public class XmppManager {
 		}
 
 		Set<RosterEntry> entries = roster.getEntries();
-		LOGGER.info("Removing all " + entries.size() + " roster entries");
+		StringBuilder infoLogMessage = new StringBuilder();
+		infoLogMessage.append("Roster has " + entries.size() + ". Removing all");
+		if (keepJid != null) {
+			infoLogMessage.append(" excluding " + keepJid);
+		}
+		LOGGER.info(infoLogMessage.toString());
 		for (RosterEntry entry : entries) {
+			BareJid entryJid = entry.getJid();
+			if (keepJid != null && keepJid.equals(entryJid)) continue;
+
 			try {
 				roster.removeEntry(entry);
 			} catch (SmackException.NotLoggedInException | SmackException.NoResponseException | XMPPException.XMPPErrorException
