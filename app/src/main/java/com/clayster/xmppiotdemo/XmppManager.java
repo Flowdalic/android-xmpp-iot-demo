@@ -101,7 +101,7 @@ public class XmppManager {
 		if (builder == null) throw new IllegalStateException();
 
 		if (xmppConnection != null) {
-			xmppConnection.disconnect();
+			asmackManager.disconnectAndUnmanage(xmppConnection);
 			xmppConnection = null;
 
 			roster.removeRosterListener(mRosterListener);

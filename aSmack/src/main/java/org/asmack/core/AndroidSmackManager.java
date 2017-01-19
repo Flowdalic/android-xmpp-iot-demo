@@ -113,6 +113,13 @@ public class AndroidSmackManager {
 		}
 	}
 
+	public void disconnectAndUnmanage(XMPPTCPConnection connection) {
+		connection.disconnect();
+		synchronized (mManagedConnections) {
+			mManagedConnections.remove(connection);
+		}
+	}
+
 	public void addNewManagedConnectionListener(NewManagedConnectionListener newManagedConnectionListener) {
 		mNewConnectionListeners.add(newManagedConnectionListener);
 	}
