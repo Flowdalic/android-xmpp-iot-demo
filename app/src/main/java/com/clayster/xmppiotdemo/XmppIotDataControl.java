@@ -91,7 +91,7 @@ public class XmppIotDataControl {
 
 					if (!mSettings.isIdentityModeApp()) return;
 
-					XmppManager.emptyRoster(connection);
+					//XmppManager.emptyRoster(connection);
 
 					final EntityBareJid thingJid = mSettings.getThingJid();
 					if (thingJid == null) return;
