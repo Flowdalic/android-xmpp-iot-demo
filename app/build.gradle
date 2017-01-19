@@ -1,20 +1,8 @@
 apply plugin: 'com.android.application'
 
-buildscript {
-  repositories {
-     mavenCentral()
-  }
-
-  dependencies {
-     classpath 'me.tatarka:gradle-retrolambda:3.2.5'
-  }
-}
-
 repositories {
   mavenCentral()
 }
-
-//apply plugin: 'me.tatarka.retrolambda'
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
