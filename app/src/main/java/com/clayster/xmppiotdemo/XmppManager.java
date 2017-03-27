@@ -30,6 +30,7 @@ import org.asmack.core.AndroidSmackManager;
 import org.asmack.core.ManagedXmppConnection;
 import org.asmack.core.XmppConnectionState;
 import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
@@ -59,6 +60,10 @@ import java.util.logging.Logger;
 public class XmppManager {
 
 	private static final Logger LOGGER = Logger.getLogger(XmppManager.class.getName());
+
+	static {
+		SmackConfiguration.addDisabledSmackClass("org.jivesoftware.smackx.httpupload");
+	}
 
 	private static XmppManager INSTANCE;
 

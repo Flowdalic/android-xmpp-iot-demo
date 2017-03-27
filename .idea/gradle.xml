@@ -8,10 +8,10 @@
         <option name="gradleHome" value="$APPLICATION_HOME_DIR$/gradle/gradle-2.10" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/MemorizingTrustManager" />
-            <option value="$PROJECT_DIR$/aSmack" />
-            <option value="$PROJECT_DIR$/app" />
+            <option value="/data/flo/code/android-xmpp-iot-demo" />
+            <option value="/data/flo/code/android-xmpp-iot-demo/MemorizingTrustManager" />
+            <option value="/data/flo/code/android-xmpp-iot-demo/aSmack" />
+            <option value="/data/flo/code/android-xmpp-iot-demo/app" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
