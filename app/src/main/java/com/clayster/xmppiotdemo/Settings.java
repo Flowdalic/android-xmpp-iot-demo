@@ -72,6 +72,8 @@ public class Settings {
 	private final SharedPreferences preferences;
 	private final MemorizingTrustManager mMemorizingTrustManager;
 
+	private final XiotBluetoothLeManager mXiotBluetoothManager;
+
 	private EntityBareJid myJidCache;
 	private EntityBareJid thingJidCache;
 	private EntityBareJid ownerJidCache;
@@ -81,6 +83,7 @@ public class Settings {
 	private Settings(Context context) {
 		this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		mMemorizingTrustManager = new MemorizingTrustManager(context.getApplicationContext());
+		mXiotBluetoothManager = XiotBluetoothLeManager.getInstance(context);
 
 		IOT_CLAIM_ENABLED_KEY = context.getResources().getString(R.string.iot_claim_enabled_pref_key);
 
@@ -92,6 +95,12 @@ public class Settings {
 					String newIdentityMode = p.getString(IDENTIY_MODE_KEY, "");
 					switch (newIdentityMode) {
 						case "thing":
+							break;
+						case "app":
+							mXiotBluetoothManager.disableManager();
+							break;
+						default:
+							throw new AssertionError();
 					}
 					break;
 			}

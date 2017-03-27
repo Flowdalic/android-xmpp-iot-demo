@@ -19,6 +19,9 @@
 
 package com.clayster.xmppiotdemo;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -41,6 +44,8 @@ import java.util.logging.Logger;
 public class MainActivity extends AppCompatActivity {
 
 	private static final Logger LOGGER = Logger.getLogger(MainActivity.class.getName());
+
+	private static final int REQUEST_ENABLE_BLUETOOTH = 1;
 
 	private Settings mSettings;
 
@@ -91,6 +96,8 @@ public class MainActivity extends AppCompatActivity {
 	Switch mContiniousReadOutSwitch;
 
 	Switch mControlSwitch;
+
+	private XiotBluetoothLeManager mXiotBluetoothLeManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -155,6 +162,12 @@ public class MainActivity extends AppCompatActivity {
 		mXmppIotThing.mainActivityOnCreate(this);
 		mXmppIotDataControl.mainActivityOnCreate(this);
 		xmppManager.mainActivityOnCreate(this);
+
+		mXiotBluetoothLeManager = XiotBluetoothLeManager.getInstance(this);
+
+		synchronized (sMainActivityLock) {
+			sMainActivity = this;
+		}
 	}
 
 	public void configureButtonClicked(View view) {
@@ -255,14 +268,43 @@ public class MainActivity extends AppCompatActivity {
 		} else {
 			mIotClaimedLinearLayout.setVisibility(View.GONE);
 		}
+
+		if (mSettings.isIdentityModeThing()) {
+			BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+			BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+			if (bluetoothAdapter != null) {
+				if (!bluetoothAdapter.isEnabled()) {
+					Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+					startActivityForResult(enableBluetoothIntent, REQUEST_ENABLE_BLUETOOTH);
+				} else {
+					mXiotBluetoothLeManager.enableManager();
+				}
+			}
+		}
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+			case REQUEST_ENABLE_BLUETOOTH:
+				switch (resultCode) {
+					case RESULT_OK:
+						mXiotBluetoothLeManager.enableManager();
+						break;
+				}
+				break;
+			default:
+				throw new AssertionError();
+		}
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		xmppManager.mainActivityOnDestroy(this);
-		mXmppIotDataControl.mainActivityOnDestroy(this);
-		mXmppIotThing.mainActivityOnDestroy(this);
+
+		synchronized (sMainActivityLock) {
+			sMainActivity = null;
+		}
 	}
 
 	private void reload() {
@@ -271,4 +313,16 @@ public class MainActivity extends AppCompatActivity {
 		startActivity(intent);
 	}
 
+	private static final Object sMainActivityLock = new Object();
+	private static MainActivity sMainActivity;
+
+	static void withMainActivity(WithActivity withActivity) {
+		synchronized (sMainActivityLock) {
+			if (sMainActivity == null) return;
+
+			sMainActivity.runOnUiThread(() -> {
+				withActivity.withActivity(sMainActivity);
+			});
+		}
+	}
 }

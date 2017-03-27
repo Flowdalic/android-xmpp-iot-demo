@@ -77,9 +77,6 @@ public class XmppManager {
 	private XMPPTCPConnection xmppConnection;
 	private Roster roster;
 
-	private final Object mainActivityLock = new Object();
-	private MainActivity mainActivity;
-
 	private final Drawable mOnlineDrawable;
 	private final Drawable mOfflineDrawable;
 	private final Drawable mConnectingDrawlable;
@@ -203,7 +200,6 @@ public class XmppManager {
 	}
 
 	void mainActivityOnCreate(MainActivity mainActivity) {
-		this.mainActivity = mainActivity;
 		if (settings.isBasicConfigurationDone() && xmppConnection == null) {
 			adoptXmppConfiguration();
 		}
@@ -211,14 +207,6 @@ public class XmppManager {
 
 		maybeSetJidsPresenceGui();
 		maybeUpdateConnectionStateGui();
-	}
-
-	void mainActivityOnDestroy(MainActivity mainActivity) {
-		assert (this.mainActivity == mainActivity);
-
-		synchronized (mainActivityLock) {
-			this.mainActivity = null;
-		}
 	}
 
 	private final StanzaListener mMessageListener = (stanza) -> {
@@ -247,10 +235,7 @@ public class XmppManager {
 	}
 
 	void withMainActivity(final WithActivity<MainActivity> withMainActivity) {
-		synchronized (mainActivityLock) {
-			if (mainActivity == null) return;
-			mainActivity.runOnUiThread(() -> withMainActivity.withActivity(mainActivity));
-		}
+		MainActivity.withMainActivity(withMainActivity);
 	}
 
 	EntityFullJid getFullThingJidOrNotify() {

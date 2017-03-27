@@ -57,9 +57,6 @@ public class XmppIotDataControl {
 		return INSTANCE;
 	}
 
-	private final Object mMainActivityLock = new Object();
-	private MainActivity mMainActivity;
-
 	private final Context mContext;
 	private final XmppManager mXmppManager;
 	private final Settings mSettings;
@@ -132,29 +129,16 @@ public class XmppIotDataControl {
 	}
 
 	void mainActivityOnCreate(MainActivity mainActivity) {
-		this.mMainActivity = mainActivity;
-
-		mMainActivity.mReadOutButton.setOnClickListener((button) -> performReadOutAsync());
-		mMainActivity.mControlSwitch.setOnCheckedChangeListener((button, isChecked) -> controlNotificationAlarmAsync(isChecked));
-		mMainActivity.mContiniousReadOutSwitch.setOnCheckedChangeListener((button, isChecked) -> setContinousReadOut(isChecked));
+		mainActivity.mReadOutButton.setOnClickListener((button) -> performReadOutAsync());
+		mainActivity.mControlSwitch.setOnCheckedChangeListener((button, isChecked) -> controlNotificationAlarmAsync(isChecked));
+		mainActivity.mContiniousReadOutSwitch.setOnCheckedChangeListener((button, isChecked) -> setContinousReadOut(isChecked));
 
 		boolean connectionUsable = mXmppManager.isConnectionUseable();
 	    setGuiElements(mainActivity, connectionUsable);
 	}
 
-	void mainActivityOnDestroy(MainActivity mainActivity) {
-		assert (this.mMainActivity == mainActivity);
-
-		synchronized (mMainActivityLock) {
-			this.mMainActivity = null;
-		}
-	}
-
 	private void withMainActivity(final WithActivity<MainActivity> withMainActivity) {
-		synchronized (mMainActivityLock) {
-			if (mMainActivity == null) return;
-			mMainActivity.runOnUiThread(() -> withMainActivity.withActivity(mMainActivity));
-		}
+		MainActivity.withMainActivity(withMainActivity);
 	}
 
 	private void setContinousReadOut(boolean continousReadOut) {

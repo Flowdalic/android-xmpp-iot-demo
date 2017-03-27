@@ -112,8 +112,7 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 
 	private final NotificationManager mNotificationManager;
 
-	private final Object mMainActivityLock = new Object();
-	private MainActivity mMainActivity;
+	private final XiotBluetoothLeManager mXiotBluetoothLeManager;
 
 	private XmppIotThing(Context context) {
 		mContext = context.getApplicationContext();
@@ -135,6 +134,7 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 		mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
 		mTemperatureSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
 		mGravitySensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
+		mXiotBluetoothLeManager = XiotBluetoothLeManager.getInstance(context);
 
 		mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -198,6 +198,12 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 			int gravity = (int) (float) mGravity;
 			IoTDataField.IntField gravityField = new IoTDataField.IntField("gravity", gravity);
 			res.add(gravityField);
+		}
+
+		int heartRate = mXiotBluetoothLeManager.getHeartRate();
+		if (heartRate >= 0) {
+			IoTDataField.IntField heartRateField = new IoTDataField.IntField("heart-rate", heartRate);
+			res.add(heartRateField);
 		}
 
 		callback.momentaryReadOut(res);
@@ -303,27 +309,14 @@ public class XmppIotThing implements ThingMomentaryReadOutRequest, ThingControlR
 	}
 
 	void mainActivityOnCreate(MainActivity mainActivity) {
-		this.mMainActivity = mainActivity;
-
 		for (Tag tag : mThing.getMetaTags()) {
 			IotThingInfoView thingInfo = new IotThingInfoView(mainActivity, tag.getName(), tag.getValue());
 			mainActivity.mIotThingInfosLinearLayout.addView(thingInfo);
 		}
 	}
 
-	void mainActivityOnDestroy(MainActivity mainActivity) {
-		assert (this.mMainActivity == mainActivity);
-
-		synchronized (mMainActivityLock) {
-			this.mMainActivity = null;
-		}
-	}
-
 	private void withMainActivity(final WithActivity<MainActivity> withMainActivity) {
-		synchronized (mMainActivityLock) {
-			if (mMainActivity == null) return;
-			mMainActivity.runOnUiThread(() -> withMainActivity.withActivity(mMainActivity));
-		}
+		MainActivity.withMainActivity(withMainActivity);
 	}
 
 	private void onAuthenticated(XMPPConnection connection) {
