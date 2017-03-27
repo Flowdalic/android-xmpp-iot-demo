@@ -241,9 +241,13 @@ public class XiotBluetoothLeManager {
 	// Stop scanning after 10 seconds.
 	private static final long SCAN_PERIOD = 10000;
 
+	private volatile boolean mBluetoothLeScanOngoing;
+
 	void startBleDeviceDiscovery() {
 
 		if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) return;
+
+		if (mBluetoothLeScanOngoing) return;
 
 		Async.go(() -> {
 			try {
@@ -259,6 +263,7 @@ public class XiotBluetoothLeManager {
 		MainActivity.withMainActivity((ma) -> {
 			Toast.makeText(ma, "Starting Bluetooth LE scan", Toast.LENGTH_SHORT).show();
 		});
+		mBluetoothLeScanOngoing = true;
 		mBluetoothAdapter.startLeScan(mLeScanCallback);
 	}
 
@@ -268,6 +273,7 @@ public class XiotBluetoothLeManager {
 
 	private void stopBleDeviceDiscovery() {
 		LOGGER.info("Stopping Bluetooth LE scan on " + mBluetoothAdapter);
+		mBluetoothLeScanOngoing = false;
 		mBluetoothAdapter.stopLeScan(mLeScanCallback);
 	}
 
