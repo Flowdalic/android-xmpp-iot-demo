@@ -19,12 +19,16 @@
 
 package com.clayster.xmppiotdemo;
 
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -46,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
 	private static final Logger LOGGER = Logger.getLogger(MainActivity.class.getName());
 
 	private static final int REQUEST_ENABLE_BLUETOOTH = 1;
+	private static final int ACCESS_COARSE_LOCATION_REQUEST_CODE = 2;
 
 	private Settings mSettings;
 
@@ -98,6 +103,8 @@ public class MainActivity extends AppCompatActivity {
 	Switch mControlSwitch;
 
 	private XiotBluetoothLeManager mXiotBluetoothLeManager;
+
+	private boolean mAccessCoarseLocationPermissionDenied = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -270,16 +277,31 @@ public class MainActivity extends AppCompatActivity {
 		}
 
 		if (mSettings.isIdentityModeThing()) {
-			BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-			BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
-			if (bluetoothAdapter != null) {
-				if (!bluetoothAdapter.isEnabled()) {
-					Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-					startActivityForResult(enableBluetoothIntent, REQUEST_ENABLE_BLUETOOTH);
-				} else {
-					mXiotBluetoothLeManager.enableManager();
+			if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && !mAccessCoarseLocationPermissionDenied) {
+				ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+			} else {
+				BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+				BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+				if (bluetoothAdapter != null) {
+					if (!bluetoothAdapter.isEnabled()) {
+						Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+						startActivityForResult(enableBluetoothIntent, REQUEST_ENABLE_BLUETOOTH);
+					} else {
+						mXiotBluetoothLeManager.enableManager();
+					}
 				}
 			}
+		}
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		switch (requestCode) {
+			case ACCESS_COARSE_LOCATION_REQUEST_CODE:
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
+					// Do not longer ask for that permission.
+					mAccessCoarseLocationPermissionDenied = true;
+				}
 		}
 	}
 

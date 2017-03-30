@@ -60,6 +60,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile project(':aSmack')
     compile project(':MemorizingTrustManager')
+    compile 'com.android.support:support-compat:24.2.1'
     compile 'com.android.support:appcompat-v7:24.1.1'
     compile 'com.android.support:design:24.1.1'
     // Disabled java-pinning is currently not used as we use the MemorizingTrustManager
