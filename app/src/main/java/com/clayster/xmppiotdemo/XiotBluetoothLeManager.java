@@ -68,10 +68,10 @@ public class XiotBluetoothLeManager {
 		mBluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
 		mBluetoothAdapter = mBluetoothManager.getAdapter();
 
-		context.registerReceiver(mBluetoothAdapterStateReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
 	}
 
 	void enableManager() {
+		mContext.registerReceiver(mBluetoothAdapterStateReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
 		if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) return;
 
 		if (mPolarH7BluetoothGatt != null) return;
@@ -80,6 +80,7 @@ public class XiotBluetoothLeManager {
 	}
 
 	void disableManager() {
+		mContext.unregisterReceiver(mBluetoothAdapterStateReceiver);
 		resetHeartRateInformation();
 		if (mPolarH7BluetoothGatt == null) return;
 

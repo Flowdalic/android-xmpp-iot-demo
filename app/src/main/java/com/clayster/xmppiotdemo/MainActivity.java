@@ -302,6 +302,8 @@ public class MainActivity extends AppCompatActivity {
 	public void onDestroy() {
 		super.onDestroy();
 
+		mXiotBluetoothLeManager.disableManager();
+
 		synchronized (sMainActivityLock) {
 			sMainActivity = null;
 		}
