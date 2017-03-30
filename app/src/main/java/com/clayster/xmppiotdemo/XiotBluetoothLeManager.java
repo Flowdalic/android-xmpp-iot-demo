@@ -120,7 +120,7 @@ public class XiotBluetoothLeManager {
 
 			LOGGER.info("Found Bluetooth device '" + deviceInfo + "' with rssi " + rssi);
 
-			if (!name.startsWith("Polar H7")) return;
+			if (name == null || !name.startsWith("Polar H7")) return;
 
 			MainActivity.withMainActivity((ma) -> {
 				Toast.makeText(ma, "Found Polar H7 device, trying to discover services", Toast.LENGTH_SHORT).show();
